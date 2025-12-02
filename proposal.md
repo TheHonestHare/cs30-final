@@ -17,9 +17,9 @@
     - buttons, levers, doors
     - maybe more?
 - level editor so I don't go insane making levels
+- music/sfx
 
 ## Nice To Have
 - actually good art
 - level select screen
 - some sort of game story
-- music/sfx
