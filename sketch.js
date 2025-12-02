@@ -54,8 +54,9 @@ function draw() {
   player.process_input();
   player.physics_tick(deltaTime / 1000);
   abilities.physics_tick(deltaTime / 1000);
-  cam.transform();
   bg.draw();
+  cam.update(deltaTime / 1000);
+  cam.transform();
   level.draw();
   player.draw();
   abilities.placer.highlight_grid_pos();
