@@ -6,22 +6,24 @@ const cam = {
   calculateCameraStartPos(spawn, level_w, level_h) {
     let y = height - level_h * this.zoom * 8;
     if(y < 0) y = height - spawn.y * this.zoom * 8 - height / 2;
-    this.aabb = new physics.AABB(createVector(0, y), createVector(width / this.zoom / 8, height / this.zoom / 8));
-    this.targetOffset = player.aabb.get_centre();
+    this.aabb = new physics.AABB(createVector(), createVector(width / this.zoom / 8, height / this.zoom / 8));
+    this.target = player.aabb.get_centre();
+    this.aabb.set_centre(p5.Vector.sub(this.aabb.dims, this.target));
   },
   transform() {
-    translate(this.aabb.origin);
     scale(this.zoom * 8);
+    translate(this.aabb.origin);
     fill("yellow");
     circle(this.target.x, this.target.y, 1);
+    circle(this.aabb.dims.x, this.aabb.dims.y, 1);
   },
   update(deltaT) {
-    this.target = p5.Vector.add(player.aabb.get_centre(), 0);
-    const maxSpeed = max(player.vel.mag() * 1.5 * deltaT, 20 * deltaT);
-    let delta = p5.Vector.sub(this.target, this.aabb.get_centre());
-    console.log(delta);
+    this.target = p5.Vector.add(player.aabb.get_centre(), createVector(30, 0));
+    const maxSpeed = 20 * deltaT;
+    let delta = p5.Vector.sub(this.aabb.dims, this.target).sub(this.aabb.get_centre());
+    delta.y = 0;
     delta.setMag(Math.min(delta.mag(), maxSpeed));
-    this.aabb.set_centre(this.target);
+    this.aabb.origin.add(delta);
   }
   
 };
