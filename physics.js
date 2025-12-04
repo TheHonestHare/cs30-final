@@ -6,6 +6,22 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
 }
 
+// returns an acceleration that will stop whatever thing with a certain velocity at a point
+function dampAcc(v_i, dx) {
+  return -(v_i ** 2) / (2*dx);
+}
+
+function dampAccV(v_i, delta) {
+  let res = p5.Vector.mult(v_i, v_i).mult(-1, -1);
+  res.div(p5.Vector.mult(delta, 2));
+  return res;
+}
+
+// returns the time to reach a point given a constant velocity
+function timeToReach(v, dx) {
+  return dx / v;
+}
+
 // based off of the unity implementation https://docs.unity3d.com/ScriptReference/Mathf.SmoothDamp.html
 // returns { pos, newVel }
 function smoothDamp(from, to, initVel, smoothTime, deltaT) {
