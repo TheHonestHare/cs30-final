@@ -58,6 +58,13 @@ const physics = (() => {
           this.dims = p5.Vector.add(box_dims, padding);
         }
       }
+      // doesn't change point if inside the AABB, or the nearest position inside the AABB if not inside
+      snapPointTo(point) {
+        const res = createVector();
+        res.x = clamp(point, 0, this.dims.x);
+        res.y = clamp(point, 0, this.dims.y);
+        return res;
+      }
       
       // WARNING: will include padding
       get_centre() {
