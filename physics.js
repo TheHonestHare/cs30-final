@@ -51,8 +51,8 @@ const physics = (() => {
       // padding is applied to top and left sides
       constructor(box_origin, box_dims, padding) {
         if(!padding) {
-          this.origin = box_origin;
-          this.dims = box_dims;
+          this.origin = box_origin.copy();
+          this.dims = box_dims.copy();
         } else {
           this.origin = p5.Vector.sub(box_origin, padding);
           this.dims = p5.Vector.add(box_dims, padding);
@@ -197,8 +197,6 @@ const physics = (() => {
     do_collisions(thing, deltaT) {
       // precondition
       if(thing.aabb === undefined || thing.vel === undefined) return;
-      // if player has been away from game, stop deltaTime from accumulating
-      if(deltaTime > 1/15*1000) return;
 
       let res;
       const spanned = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, p5.Vector.mult(thing.vel, deltaT));

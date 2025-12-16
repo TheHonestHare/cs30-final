@@ -49,6 +49,7 @@ function setup() {
 }
 
 function draw() {
+  if(deltaTime/1000 > 1/15) return;
   noStroke();
   noSmooth();
   player.process_input();
