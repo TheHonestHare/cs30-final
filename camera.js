@@ -13,15 +13,18 @@ const cam = {
   },
   calculateCameraStartPos(spawn, level_w, level_h) {
     this.aabb = new physics.AABB(createVector(), createVector(width / this.zoom / 8, height / this.zoom / 8));
-    this.target = player.aabb.get_centre();
-    this.target.y = level_h / 2;
+    this.target = new physics.AABB(p5.Vector.mult(cam.aabb.dims, 0.5), createVector(level.w, level.h).sub(cam.aabb.dims)).snapPointTo(player.aabb.get_centre());
     this.aabb.set_centre(p5.Vector.sub(this.aabb.dims, this.target));
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
   },
   transform() {
     scale(this.zoom * 8);
-    translate(this.aabb.origin);
+    let translation = p5.Vector.mult(this.aabb.origin, 8);
+    translation.x = Math.floor(translation.x);
+    translation.y = Math.floor(translation.y);
+    translation.mult(1/8);
+    translate(translation);
   },
   camera_debug_draw() {
     fill("yellow");

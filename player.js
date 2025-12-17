@@ -63,6 +63,7 @@ class Player {
   respawn() {
     player.vel = createVector(0, 0);
     player.aabb.origin = level.scene_items[0].aabb.origin.copy();
+    cam.calculateCameraStartPos(null, level.w, level.h);
   }
   
   process_input() {
