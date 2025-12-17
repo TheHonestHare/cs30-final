@@ -61,8 +61,8 @@ const physics = (() => {
       // doesn't change point if inside the AABB, or the nearest position inside the AABB if not inside
       snapPointTo(point) {
         const res = createVector();
-        res.x = clamp(point, 0, this.dims.x);
-        res.y = clamp(point, 0, this.dims.y);
+        res.x = clamp(point.x, this.origin.x, this.origin.x + this.dims.x);
+        res.y = clamp(point.y, this.origin.y, this.origin.y + this.dims.y);
         return res;
       }
       

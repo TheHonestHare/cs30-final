@@ -1,6 +1,6 @@
 const cam = {
   aabb: undefined,
-  zoom: 4.0,
+  zoom: 5.0,
   target: undefined,
   vel: undefined,
   acc: undefined,
@@ -22,20 +22,19 @@ const cam = {
   transform() {
     scale(this.zoom * 8);
     translate(this.aabb.origin);
-    circle(-this.aabb.origin.x+cam.aabb.dims.x/2, 0, 1);
+  },
+  camera_debug_draw() {
     fill("yellow");
+    circle(-this.aabb.origin.x+cam.aabb.dims.x/2, -this.aabb.origin.y+cam.aabb.dims.y/2, 1);
     circle(this.target.x, this.target.y, 1);
-    circle(this.aabb.dims.x, this.aabb.dims.y, 1);
-    circle(0, 0, 1);
-    circle(level.w, 0, 1);
   },
   update(deltaT) {
-    this.target = p5.Vector.add(player.aabb.get_centre(), createVector(15, 0));
-    //this.target = (new physics.AABB(p5.Vector.mult(cam.aabb.dims, 0.5), createVector(level.w, level.h).sub(cam.aabb.dims))).snapPointTo(this.target);
+    this.target = p5.Vector.add(player.aabb.get_centre(), createVector(10, 0));
+    this.target = new physics.AABB(p5.Vector.mult(cam.aabb.dims, 0.5), createVector(level.w, level.h).sub(cam.aabb.dims)).snapPointTo(this.target);
     const maxSpeed = 40;
     let delta = p5.Vector.sub(this.aabb.dims, this.target).sub(this.aabb.get_centre());
     delta.y = 0;
-    if(Math.abs(delta.x) < 0.3) {
+    if(Math.abs(delta.x) < 0.0001) {
       this.vel.x = 0;
     } else {
       this.vel.x = (delta.x > 0 ? 1 : -1) * Math.min(maxSpeed, Math.abs(delta.x) * 2.5);

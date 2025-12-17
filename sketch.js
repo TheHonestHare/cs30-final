@@ -63,6 +63,7 @@ function draw() {
   abilities.placer.highlight_grid_pos();
   level_editor.render_selection();
   abilities.draw();
+  cam.camera_debug_draw();
 }
 
 function keyPressed() {
