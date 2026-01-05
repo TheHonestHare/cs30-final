@@ -112,96 +112,33 @@ const abilities = (() => {
 
       constructor(x, y) {
         const padding = 0.75;
-        this.time_of_activation = null;
-        this.original_player_pos = null;
-        this.has_snapped_pos = null;
-        this.dash_direction = null;
-        
+        this.done = false;
         this.grid_pos = createVector(x, y);
         this.activate_box = new physics.AABB(createVector(x, y).sub(padding, padding), createVector(1, 1).add(2 * padding, 2 * padding));
       }
       would_click_remove(click_grid_pos) {
-        return click_grid_pos.x === this.x && click_grid_pos.y === this.y;
+        return click_grid_pos.x === this.grid_pos.x && click_grid_pos.y === this.grid_pos.y;
       }
       activate() {
         if(!this.activate_box.is_overlapping_aabb(player.aabb)) return false;
 
         console.log("player is dashing");
-
-        this.time_of_activation = millis();
-        this.original_player_pos = player.pos;
-        this.has_snapped_pos = false;
-
-        player.vel = createVector(0, 0);
-        player.physics_tick = abilities.Dash.player_physics_tick(this);
-        player.draw = abilities.Dash.player_draw(this);
+        player.dashActivate(abilities.Dash.deactivate(this), this);
         return true;
       }
-      deactivate() {
-        console.log("player finished dashing");
-        player.draw = Player.default_draw;
-        player.physics_tick = Player.default_physics_tick;
-        player.vel = createVector(0, 0);
+      static deactivate(context) {
+        return () => {
+          console.log("player finished dashing");
+          context.done = true;
+        };
       }
       physics_tick(deltaT) {
-        if((millis() - this.time_of_activation) / 1000 < abilities.Dash.total_dash_length) return true;
-        // dash is finished;
-        this.deactivate();
-        return false;
+        return this.done;
       }
       draw(state) {
         // TODO: add animations
         if(state === abilities.draw_states.INACTIVE) return;
         abilities.Dash.idle_sprite.draw(this.grid_pos.x, this.grid_pos.y, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
-      }
-      static player_physics_tick(context) {
-        return function(deltaT) {
-          const ability_duration = (millis() - context.time_of_activation) / 1000;
-
-
-          if(ability_duration < 0.05) {
-            return;
-          }
-          if(!context.has_snapped_pos) {
-            this.aabb.set_centre(context.activate_box.get_centre());
-
-            context.dash_direction = createVector(0, -1);
-            if(this.keys.down) context.dash_direction = createVector(0, 1);
-            if(this.keys.up) context.dash_direction = createVector(0, -1);
-            if(this.keys.left) context.dash_direction = createVector(-1, 0);
-            if(this.keys.right) context.dash_direction = createVector(1, 0);
-            this.vel = p5.Vector.mult(context.dash_direction, abilities.Dash.dash_speed);
-
-            context.has_snapped_pos = true;
-          }
-          const completion_delta_t = ability_duration >= abilities.Dash.total_dash_length ? -(ability_duration - abilities.Dash.total_dash_length - deltaT) : deltaT;
-
-          physics.do_collisions(player, completion_delta_t);
-
-          // end ability
-          if(ability_duration >= abilities.Dash.total_dash_length) {
-            const remaining_delta_t = deltaT - completion_delta_t;
-            context.deactivate();
-            physics.do_collisions(player, remaining_delta_t);
-          }
-        };
-      }
-      static player_draw(context) {
-        return function() {
-          noSmooth();
-          if(context.dash_direction === null) {
-            // haven't started dashing yet
-            this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
-          } else if(context.dash_direction.x !== 0) {
-            // dashing horizontally
-            this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y + this.aabb.dims.y / 3, this.aabb.dims.x, this.aabb.dims.y / 3);
-          } else {
-            // dashing vertically
-            this.sprite.draw(this.aabb.origin.x + this.aabb.dims.x / 3, this.aabb.origin.y, this.aabb.dims.x / 3, this.aabb.dims.y);
-          }
-          
-          smooth();
-        };
       }
     }
 

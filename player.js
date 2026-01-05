@@ -19,15 +19,23 @@ class Player {
     };
     this.onGround = false;
     this.executingJump = false;
-
-    // abilities will temporarily set this to make their custom effects
-    this.physics_tick = Player.default_physics_tick;
-    this.draw = Player.default_draw;
+    this.executingDash = false;
+    this.dashContext = {
+      dash_direction: null,
+      has_snapped_pos: false,
+      time_of_activation: 0,
+      deactivateCallback: null,
+      originatingOrb: null,
+    };
 
     this.sprite = sprite;
   }
-  static default_draw() {
+  draw() {
     noSmooth();
+    if(this.executingDash) {
+      this.dashDraw();
+      return;
+    }
     this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
   }
 
@@ -46,7 +54,11 @@ class Player {
     console.log("jump");
   }
 
-  static default_physics_tick(deltaT) {
+  physics_tick(deltaT) {
+    if(this.executingDash) {
+      this.dashPhysicsTick(deltaT);
+      return;
+    }
     if(this.executingJump && !this.keys.up) this.executingJump = false;
     if(this.keys.up && this.onGround && !this.executingJump) this.jump();
     if(this.keys.left === this.keys.right) {
@@ -56,13 +68,73 @@ class Player {
     }
     
     this.applyGravity(deltaT);
-    physics.do_collisions(player, deltaT);
+    physics.do_collisions(this, deltaT);
     if(this.aabb.origin.y > level.h + 5) this.respawn();
   }
 
+  dashActivate(deactivateCallback, originatingOrb) {
+    this.dashContext.time_of_activation = millis();
+    this.dashContext.original_player_pos = player.pos;
+    this.dashContext.has_snapped_pos = false;
+    this.dashContext.deactivateCallback = deactivateCallback;
+    this.dashContext.originatingOrb = originatingOrb;
+    this.vel = createVector(0, 0);
+    this.executingDash = true;
+  }
+  dashDeactivate() {
+    this.vel = createVector(0, 0);
+    this.executingDash = false;
+    this.dashContext.deactivateCallback();
+  }
+
+  dashPhysicsTick(deltaT) {
+    const context = this.dashContext;
+    const ability_duration = (millis() - context.time_of_activation) / 1000;
+    if(ability_duration < 0.05) {
+      return;
+    }
+    if(!context.has_snapped_pos) {
+      this.aabb.set_centre(context.originatingOrb.activate_box.get_centre());
+
+      context.dash_direction = createVector(0, -1);
+      if(this.keys.down) context.dash_direction = createVector(0, 1);
+      if(this.keys.up) context.dash_direction = createVector(0, -1);
+      if(this.keys.left) context.dash_direction = createVector(-1, 0);
+      if(this.keys.right) context.dash_direction = createVector(1, 0);
+      this.vel = p5.Vector.mult(context.dash_direction, abilities.Dash.dash_speed);
+
+      context.has_snapped_pos = true;
+    }
+    console.log("here");
+    const completion_delta_t = ability_duration >= abilities.Dash.total_dash_length ? -(ability_duration - abilities.Dash.total_dash_length - deltaT) : deltaT;
+
+    physics.do_collisions(this, completion_delta_t);
+
+    // end ability
+    if(ability_duration >= abilities.Dash.total_dash_length) {
+      const remaining_delta_t = deltaT - completion_delta_t;
+      this.dashDeactivate();
+      physics.do_collisions(this, remaining_delta_t);
+    }
+  }
+
+  dashDraw() {
+    const context = this.dashContext;
+    if(context.dash_direction === null) {
+      // haven't started dashing yet
+      this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
+    } else if(context.dash_direction.x !== 0) {
+      // dashing horizontally
+      this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y + this.aabb.dims.y / 3, this.aabb.dims.x, this.aabb.dims.y / 3);
+    } else {
+      // dashing vertically
+      this.sprite.draw(this.aabb.origin.x + this.aabb.dims.x / 3, this.aabb.origin.y, this.aabb.dims.x / 3, this.aabb.dims.y);
+    }
+  }
+
   respawn() {
-    player.vel = createVector(0, 0);
-    player.aabb.origin = level.scene_items[0].aabb.origin.copy();
+    this.vel = createVector(0, 0);
+    this.aabb.origin = level.scene_items[0].aabb.origin.copy();
     cam.calculateCameraStartPos(null, level.w, level.h);
   }
   
