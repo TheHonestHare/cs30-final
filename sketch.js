@@ -25,14 +25,17 @@ let level;
 let player;
 
 let blockSpriteSheet;
-let blockSprites = [];
+let blockSprites = new Map();
 
 let miscSpriteSheet;
 let playerSprite;
 
 function preload() {
   blockSpriteSheet = new material.SpriteSheet("blocks.png");
-  blockSprites.push(new material.Sprite(blockSpriteSheet, 0, 0, 64, 64));
+  blockSprites.set("wood", new material.Sprite(blockSpriteSheet, 0, 0, 8, 8));
+  blockSprites.set("left_grip", new material.Sprite(blockSpriteSheet, 8, 0, 8, 8));
+  blockSprites.set("right_grip", new material.Sprite(blockSpriteSheet, 16, 0, 8, 8));
+
 
   miscSpriteSheet = new material.SpriteSheet("misc.png");
   playerSprite = new material.Sprite(miscSpriteSheet, 0, 0, 8, 8);
@@ -78,7 +81,17 @@ function keyPressed() {
     level_editor.active = !level_editor.active;
   }
   if(key === 'j') abilities.activate();
-
+  if(keyCode === RIGHT_ARROW && level_editor.active) {
+    if(level_editor.selected_block < level.block_names.length - 1) {
+      level_editor.selected_block += 1;
+    }
+  }
+  if(keyCode === LEFT_ARROW && level_editor.active) {
+    if(level_editor.selected_block > 1) {
+      level_editor.selected_block -= 1;
+    }
+  }
+  console.log(level_editor.selected_block);
 }
 function mousePressed() {
   abilities.placer.onLeftClick();

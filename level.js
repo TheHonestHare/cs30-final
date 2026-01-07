@@ -1,7 +1,8 @@
 class Level {
-  constructor(block_array, w, h, spawnx, spawny, scene_items) {
+  constructor(block_array, block_names, w, h, spawnx, spawny, scene_items) {
     // deep copy array
     this.block_array = [...block_array];
+    this.block_names = block_names;
     this.w = w;
     this.h = h;
     this.spawnPos = createVector(spawnx, spawny);
@@ -14,7 +15,7 @@ class Level {
     this.createLevelImage();
   }
   static fromObject(obj) {
-    return new Level(obj.block_array, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items);
+    return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items);
   }
   draw() {
     noSmooth();
@@ -28,9 +29,9 @@ class Level {
     let img = createGraphics(this.w * 8, this.h * 8);
     for(let i = 0; i < this.w; i++) {
       for(let j = 0; j < this.h; j++) {
-        const block_mat = this.block_array[j * this.w + i];
-        if(block_mat === blockEnum.AIR) continue;   
-        blockSprites[block_mat-1].draw_to_dest(img, i * 8, j * 8, 8, 8);
+        const block_mat = this.block_names[this.block_array[j * this.w + i]];
+        if(block_mat === "air") continue;   
+        blockSprites.get(block_mat).draw_to_dest(img, i * 8, j * 8, 8, 8);
       }
     }
     this.img = img;
@@ -41,10 +42,6 @@ class Level {
     level.createLevelImage();
   }
 }
-const blockEnum = {
-  AIR: 0,
-  WOOD: 1,
-};
 const level_manager = {
   "level": 0,
   "load": (n) => {

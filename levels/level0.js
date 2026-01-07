@@ -8,6 +8,12 @@ const level0 = {
     }
     return res;
   })(),
+  block_names: [
+    "air",
+    "wood",
+    "left_grip",
+    "right_grip"
+  ],
   w: 100,
   h: 30,
   spawnx: 1,
