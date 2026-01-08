@@ -114,7 +114,6 @@ const physics = (() => {
       }
       // adapted from https://noonat.github.io/intersect
       intersectSegment(pos, delta) {
-        this.draw();
         const scaleX = 1.0 / delta.x;
         const scaleY = 1.0 / delta.y;
         const isNegX = scaleX <= 0;
@@ -154,7 +153,7 @@ const physics = (() => {
       // other_box is the moving box
       sweepAABB(other_box, delta) {
         const new_box = new physics.AABB(this.origin, this.dims, other_box.dims);
-        if(new_box.isPointIn(other_box.origin) || delta.x === 0 && delta.y === 0) {
+        if(new_box.isPointIn(other_box.origin) || (delta.x === 0 && delta.y === 0)) {
           const res = this.push_aabb_out(other_box);
           //console.log(other_box.origin);
           return res;
@@ -222,18 +221,23 @@ const physics = (() => {
         const new_delta = p5.Vector.mult(thing.vel, deltaT * (1-res.time));
         const new_spanned = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, new_delta);
         let second_res;
+        let out;
         new_spanned.forEach((coord) => {
           if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) return;
           if(!level.block_array[coord.y * level.w + coord.x]) return;
           const box = new physics.AABB(coord, createVector(1, 1));
           const temp_res = box.sweepAABB(thing.aabb, new_delta);   
           if(temp_res === null) return;
-          if(second_res === undefined || temp_res.time < second_res.time) second_res = temp_res;
+          if(second_res === undefined || temp_res.time < second_res.time) {
+            second_res = temp_res;
+            out = coord;
+          }
         });
         // didn't collide with any blocks
         if(second_res === undefined) {
           thing.aabb.origin.add(new_delta);
         } else {
+          console.log(`${out.x} ${out.y}`);
           // collided with at least one thing
           thing.aabb.origin = second_res.pos;
           thing.vel.x = 0;

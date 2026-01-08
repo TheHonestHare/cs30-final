@@ -91,7 +91,6 @@ function keyPressed() {
       level_editor.selected_block -= 1;
     }
   }
-  console.log(level_editor.selected_block);
 }
 function mousePressed() {
   abilities.placer.onLeftClick();

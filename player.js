@@ -105,7 +105,6 @@ class Player {
 
       context.has_snapped_pos = true;
     }
-    console.log("here");
     const completion_delta_t = ability_duration >= abilities.Dash.total_dash_length ? -(ability_duration - abilities.Dash.total_dash_length - deltaT) : deltaT;
 
     physics.do_collisions(this, completion_delta_t);
