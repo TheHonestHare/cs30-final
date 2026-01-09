@@ -187,7 +187,7 @@ const physics = (() => {
       // check each block under to see if there is one there
       const y = Math.ceil(y_pos);
       if(!between(y, -1, level.h)) return false;
-      for(let x = Math.floor(thing.aabb.origin.x); x <= Math.ceil(thing.aabb.origin.x + thing.aabb.dims.x); x++) {
+      for(let x = Math.floor(thing.aabb.origin.x); x < Math.ceil(thing.aabb.origin.x + thing.aabb.dims.x); x++) {
         if(!between(x, -1, level.w)) continue;
         if(level.block_array[y * level.w + x]) return true;
       }
@@ -197,53 +197,49 @@ const physics = (() => {
       // precondition
       if(thing.aabb === undefined || thing.vel === undefined) return;
 
+      // x
       let res;
-      const spanned = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, p5.Vector.mult(thing.vel, deltaT));
-      for(coord of spanned) {
+      const x_delta = createVector(thing.vel.x * deltaT, 0);
+      const spanned_x = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, x_delta);
+      for(let coord of spanned_x) {
         if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) continue;
         if(!level.block_array[coord.y * level.w + coord.x]) continue;
         const box = new physics.AABB(coord, createVector(1, 1));
-        const temp_res = box.sweepAABB(thing.aabb, p5.Vector.mult(thing.vel, deltaT));   
+        const temp_res = box.sweepAABB(thing.aabb, x_delta);   
         if(temp_res === null) continue;
         if(res === undefined || temp_res.time < res.time) res = temp_res;
       };
       // didn't collide with any blocks
       if(res === undefined) {
-        thing.aabb.origin.add(p5.Vector.mult(thing.vel, deltaT));
+        thing.aabb.origin.x += thing.vel.x * deltaT;
       } else {
         // collided with at least one thing
         thing.aabb.origin = res.pos;
-        if(Math.sign(res.normal.x) === Math.sign(thing.vel.x) && thing.vel.x !== 0) console.log("very wrong");
-        if(res.normal.x !== 0) thing.vel.x = 0;
-        if(res.normal.y !== 0) thing.vel.y = 0;
-
-        // second collision check for sliding
-        const new_delta = p5.Vector.mult(thing.vel, deltaT * (1-res.time));
-        const new_spanned = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, new_delta);
-        let second_res;
-        let out;
-        new_spanned.forEach((coord) => {
-          if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) return;
-          if(!level.block_array[coord.y * level.w + coord.x]) return;
-          const box = new physics.AABB(coord, createVector(1, 1));
-          const temp_res = box.sweepAABB(thing.aabb, new_delta);   
-          if(temp_res === null) return;
-          if(second_res === undefined || temp_res.time < second_res.time) {
-            second_res = temp_res;
-            out = coord;
-          }
-        });
-        // didn't collide with any blocks
-        if(second_res === undefined) {
-          thing.aabb.origin.add(new_delta);
-        } else {
-          console.log(`${out.x} ${out.y}`);
-          // collided with at least one thing
-          thing.aabb.origin = second_res.pos;
-          thing.vel.x = 0;
-          thing.vel.y = 0;
-        }
+        thing.vel.x = 0;
       }
+
+      // y
+      res = undefined;
+      const y_delta = createVector(0, thing.vel.y * deltaT);
+      const spanned_y = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, y_delta);
+      for(let coord of spanned_y) {
+        if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) continue;
+        if(!level.block_array[coord.y * level.w + coord.x]) continue;
+        const box = new physics.AABB(coord, createVector(1, 1));
+        const temp_res = box.sweepAABB(thing.aabb, y_delta);   
+        if(temp_res === null) continue;
+        if(res === undefined || temp_res.time < res.time) res = temp_res;
+      };
+      // didn't collide with any blocks
+      if(res === undefined) {
+        thing.aabb.origin.y += thing.vel.y * deltaT;
+      } else {
+        // collided with at least one thing
+        thing.aabb.origin = res.pos;
+        thing.vel.y = 0;
+      }
+
+      // update things state
       thing.onGround = physics.test_on_ground(thing);
     }
   };

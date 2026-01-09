@@ -55,6 +55,11 @@ class Player {
   }
 
   physics_tick(deltaT) {
+    if(this.onGround) {
+      this.vel.y = 0;
+    } else {
+      this.applyGravity(deltaT);
+    }
     if(this.executingDash) {
       this.dashPhysicsTick(deltaT);
       return;
@@ -67,7 +72,6 @@ class Player {
       this.vel.x = this.HORIZONTAL_SPEED * (this.keys.right ? 1 : -1);
     }
     
-    this.applyGravity(deltaT);
     physics.do_collisions(this, deltaT);
     if(this.aabb.origin.y > level.h + 5) this.respawn();
   }
