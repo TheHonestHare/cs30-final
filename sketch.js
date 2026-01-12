@@ -23,6 +23,7 @@ Extra for experts:
 
 let level;
 let player;
+let pixelatedBuffer;
 
 let blockSpriteSheet;
 let blockSprites = new Map();
@@ -45,7 +46,8 @@ function preload() {
   abilities.preload();
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  pixelatedBuffer = createFramebuffer({textureFiltering: NEAREST});
   player = new Player(4, -4, playerSprite);
   level = level_manager.load(0);
   cam.calculateCameraStartPos(cam.modes.free);
@@ -53,19 +55,28 @@ function setup() {
 
 function draw() {
   if(deltaTime/1000 > 1/15) return;
-  noStroke();
-  noSmooth();
   player.process_input();
   player.physics_tick(deltaTime / 1000);
   abilities.physics_tick(deltaTime / 1000);
   bg.draw();
-  cam.update(deltaTime / 1000);
-  cam.transform();
-  level.draw();
-  player.draw();
-  abilities.placer.highlight_grid_pos();
-  level_editor.render_selection();
-  abilities.draw();
+  pixelatedBuffer.begin();
+  
+  
+  pixelatedBuffer.draw(() => {
+    clear();
+    noStroke();
+    cam.update(deltaTime / 1000);
+    cam.transform();
+    level.draw();
+    player.draw();
+    abilities.draw();
+    abilities.placer.highlight_grid_pos();
+    level_editor.render_selection();
+  });
+  pixelatedBuffer.end();
+  image(pixelatedBuffer, 0, 0);
+
+  
   // cam.camera_debug_draw();
 }
 

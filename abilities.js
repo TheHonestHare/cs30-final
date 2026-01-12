@@ -46,7 +46,6 @@ const abilities = (() => {
     },
 
     draw() {
-      noSmooth();
       if(this.placer.active) {
         this.placed_array.forEach((placed) => {
           placed.draw(abilities.draw_states.ICON);

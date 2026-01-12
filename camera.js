@@ -23,6 +23,8 @@ const cam = {
   transform() {
     scale(this.zoom * 8);
     let translation = this.aabb.origin.copy();
+    // remove this if disabling WEBGL mode as it corrects the offset added by it
+    translation.sub(p5.Vector.div(this.aabb.dims, 2));
     // uncomment to add a pixel-snapping camera
     // translation.mult(8);
     // translation.x = Math.floor(translation.x);

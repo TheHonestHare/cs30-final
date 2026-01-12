@@ -18,7 +18,6 @@ class Level {
     return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items);
   }
   draw() {
-    noSmooth();
     image(this.img, 0, 0, this.w, this.h);
     this.scene_items.forEach((val) => {
       val.tick();

@@ -32,7 +32,6 @@ class Player {
     this.sprite = sprite;
   }
   draw() {
-    noSmooth();
     if(this.executingDash) {
       this.dashDraw();
       return;
