@@ -132,8 +132,11 @@ const abilities = (() => {
           context.done = true;
         };
       }
+      deactivate() {
+        Dash.deactivate(this)();
+      }
       physics_tick(deltaT) {
-        return this.done;
+        return !this.done;
       }
       draw(state) {
         // TODO: add animations

@@ -48,7 +48,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player(4, -4, playerSprite);
   level = level_manager.load(0);
-  cam.calculateCameraStartPos(level.spawnPos, level.w, level.h);
+  cam.calculateCameraStartPos(cam.modes.free);
 }
 
 function draw() {
@@ -79,6 +79,13 @@ function keyPressed() {
   }
   if(key === 'l') {
     level_editor.active = !level_editor.active;
+    if(level_editor.active) {
+      cam.freecam_enable();
+      player.ignoreInput = true;
+    } else {
+      cam.freecam_disable();
+      player.ignoreInput = false;
+    }
   }
   if(key === 'j') abilities.activate();
   if(keyCode === RIGHT_ARROW && level_editor.active) {
@@ -103,5 +110,11 @@ function mouseReleased(event) {
 
 function mouseWheel(event) {
   cam.zoom += event.delta / 100;
-  cam.calculateCameraStartPos(level.spawnPos, level.w, level.h);
+  cam.calculateCameraStartPos(cam.followMode);
+}
+
+function pixelAlignVector(coords) {
+  const x = Math.floor(coords.x * 8) / 8;
+  const y = Math.floor(coords.y * 8) / 8;
+  return createVector(x, y);
 }

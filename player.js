@@ -20,6 +20,7 @@ class Player {
     this.onGround = false;
     this.executingJump = false;
     this.executingDash = false;
+    this.ignoreInput = false;
     this.dashContext = {
       dash_direction: null,
       has_snapped_pos: false,
@@ -36,7 +37,8 @@ class Player {
       this.dashDraw();
       return;
     }
-    this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
+    const new_origin = pixelAlignVector(this.aabb.origin);
+    this.sprite.draw(new_origin.x, new_origin.y, this.aabb.dims.x, this.aabb.dims.y);
   }
 
   // code derived from Sebastian Lague https://www.youtube.com/watch?v=PlT44xr0iW0
@@ -64,13 +66,16 @@ class Player {
       this.dashPhysicsTick(deltaT);
       return;
     }
-    if(this.executingJump && !this.keys.up) this.executingJump = false;
-    if(this.keys.up && this.onGround && !this.executingJump) this.jump();
-    if(this.keys.left === this.keys.right) {
-      this.vel.x = 0;
-    } else {
-      this.vel.x = this.HORIZONTAL_SPEED * (this.keys.right ? 1 : -1);
+    if(!this.ignoreInput) {
+      if(this.executingJump && !this.keys.up) this.executingJump = false;
+      if(this.keys.up && this.onGround && !this.executingJump) this.jump();
+      if(this.keys.left === this.keys.right) {
+        this.vel.x = 0;
+      } else {
+        this.vel.x = this.HORIZONTAL_SPEED * (this.keys.right ? 1 : -1);
+      }
     }
+    
     
     physics.do_collisions(this, deltaT);
     if(this.aabb.origin.y > level.h + 5) this.respawn();
@@ -123,15 +128,16 @@ class Player {
 
   dashDraw() {
     const context = this.dashContext;
+    const new_origin = pixelAlignVector(this.aabb.origin);
     if(context.dash_direction === null) {
       // haven't started dashing yet
-      this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
+      this.sprite.draw(new_origin.x, new_origin.y, this.aabb.dims.x, this.aabb.dims.y);
     } else if(context.dash_direction.x !== 0) {
       // dashing horizontally
-      this.sprite.draw(this.aabb.origin.x, this.aabb.origin.y + this.aabb.dims.y / 3, this.aabb.dims.x, this.aabb.dims.y / 3);
+      this.sprite.draw(new_origin.x, new_origin.y + this.aabb.dims.y / 3, this.aabb.dims.x, this.aabb.dims.y / 3);
     } else {
       // dashing vertically
-      this.sprite.draw(this.aabb.origin.x + this.aabb.dims.x / 3, this.aabb.origin.y, this.aabb.dims.x / 3, this.aabb.dims.y);
+      this.sprite.draw(new_origin.x + this.aabb.dims.x / 3, new_origin.y, this.aabb.dims.x / 3, this.aabb.dims.y);
     }
   }
 
