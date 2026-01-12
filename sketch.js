@@ -60,6 +60,7 @@ function draw() {
   abilities.physics_tick(deltaTime / 1000);
   bg.draw();
   pixelatedBuffer.begin();
+  push();
   
   
   pixelatedBuffer.draw(() => {
@@ -73,6 +74,7 @@ function draw() {
     abilities.placer.highlight_grid_pos();
     level_editor.render_selection();
   });
+  pop();
   pixelatedBuffer.end();
   image(pixelatedBuffer, 0, 0);
 
