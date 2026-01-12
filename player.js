@@ -57,15 +57,15 @@ class Player {
   }
 
   physics_tick(deltaT) {
-    if(this.onGround) {
+    if(this.executingDash) {
+      this.dashPhysicsTick(deltaT);
+      return;
+    } else if(this.onGround) {
       this.vel.y = 0;
     } else {
       this.applyGravity(deltaT);
     }
-    if(this.executingDash) {
-      this.dashPhysicsTick(deltaT);
-      return;
-    }
+    
     if(!this.ignoreInput) {
       if(this.executingJump && !this.keys.up) this.executingJump = false;
       if(this.keys.up && this.onGround && !this.executingJump) this.jump();
