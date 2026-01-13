@@ -121765,6 +121765,8 @@
           this._pInst.noStroke();
           this._pInst.texture(img);
           this._pInst.textureMode(constants.NORMAL);
+          _renderer.drawingContext.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.NEAREST);
+          _renderer.drawingContext.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.NEAREST);
           var u0 = 0;
           if (sx <= img.width) {
             u0 = sx / img.width;
