@@ -46,11 +46,20 @@ function preload() {
   abilities.preload();
 }
 function setup() {
+  setAttributes("antialias", false);
   createCanvas(windowWidth, windowHeight, WEBGL);
-  pixelatedBuffer = createFramebuffer({textureFiltering: NEAREST});
   player = new Player(4, -4, playerSprite);
   level = level_manager.load(0);
   cam.calculateCameraStartPos(cam.modes.free);
+  
+  pixelatedBuffer = createFramebuffer({
+    antialias: false,
+    textureFiltering: NEAREST,
+    width: width / cam.zoom,
+    height: height / cam.zoom,
+    pixelDensity: 10,
+  });
+  
 }
 
 function draw() {
@@ -58,27 +67,24 @@ function draw() {
   player.process_input();
   player.physics_tick(deltaTime / 1000);
   abilities.physics_tick(deltaTime / 1000);
-  bg.draw();
-  pixelatedBuffer.begin();
-  push();
-  
   
   pixelatedBuffer.draw(() => {
+    push();
     clear();
     noStroke();
     cam.update(deltaTime / 1000);
-    cam.transform();
+    cam.transform_pixelated();
     level.draw();
     player.draw();
     abilities.draw();
-    abilities.placer.highlight_grid_pos();
-    level_editor.render_selection();
+    pop();
   });
-  pop();
-  pixelatedBuffer.end();
-  image(pixelatedBuffer, 0, 0);
-
-  
+  clear();
+  bg.draw();
+  image(pixelatedBuffer, -width/2, -height/2, width, height);
+  cam.transform();
+  abilities.placer.highlight_grid_pos();
+  level_editor.render_selection();  
   // cam.camera_debug_draw();
 }
 

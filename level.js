@@ -26,6 +26,7 @@ class Level {
   }
   createLevelImage() {
     let img = createGraphics(this.w * 8, this.h * 8);
+    img.noSmooth();
     for(let i = 0; i < this.w; i++) {
       for(let j = 0; j < this.h; j++) {
         const block_mat = this.block_names[this.block_array[j * this.w + i]];

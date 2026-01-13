@@ -32,6 +32,13 @@ const cam = {
     // translation.mult(1/8);
     translate(translation);
   },
+  transform_pixelated() {
+    scale(8);
+    let translation = this.aabb.origin.copy();
+    // remove this if disabling WEBGL mode as it corrects the offset added by it
+    translation.sub(p5.Vector.div(this.aabb.dims, 2));
+    translate(translation);
+  },
   camera_debug_draw() {
     fill("yellow");
     circle(-this.aabb.origin.x+this.aabb.dims.x/2, -this.aabb.origin.y+this.aabb.dims.y/2, 1);

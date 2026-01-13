@@ -19,7 +19,7 @@ const abilities = (() => {
         if(!between(x, -1, level.w) || !between(y, -1, level.h)) return;
         fill(0, 0, 0, 0);
         stroke('red');
-        strokeWeight((sin(millis()/250)+1.5)*0.1);
+        strokeWeight((sin(millis()/250)+1.5)*2);
         rect(x, y, 1, 1);
       },
       onLeftClick() {

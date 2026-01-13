@@ -27,7 +27,7 @@ const level_editor = {
 
     stroke(255, 255, 0, 255);
     fill(0, 0, 0, 0);
-    strokeWeight((sin(millis()/250)+1.5)*0.1);
+    strokeWeight((sin(millis()/250)+1.5)*2);
     rect(select_start.x, select_start.y, selection_width, selection_height);
     noStroke();
   },
