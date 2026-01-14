@@ -193,6 +193,23 @@ const physics = (() => {
       }
       return false;
     },
+    test_on_left_wall(thing) {
+      if(thing.aabb === undefined || thing.vel === undefined) return false;
+
+      // if distance to a horizontal edge is too big we're obviously not on the ground
+      const x_pos = thing.aabb.origin.x;
+      const mantissa = x_pos % 1;
+      if(mantissa > Number.EPSILON) return false;
+      
+      // check each block under to see if there is one there
+      const x = Math.floor(x_pos-1);
+      if(!between(x, -1, level.w)) return false;
+      for(let y = Math.floor(thing.aabb.origin.y); y < Math.ceil(thing.aabb.origin.y + thing.aabb.dims.y); y++) {
+        if(!between(y, -1, level.h)) continue;
+        if(level.block_array[y * level.w + x]) return true;
+      }
+      return false;
+    },
     do_collisions(thing, deltaT) {
       // precondition
       if(thing.aabb === undefined || thing.vel === undefined) return;
@@ -241,6 +258,7 @@ const physics = (() => {
 
       // update things state
       thing.onGround = physics.test_on_ground(thing);
+      thing.onLeftWall = physics.test_on_left_wall(thing);
     }
   };
 })();
