@@ -47,7 +47,7 @@ function preload() {
 }
 function setup() {
   setAttributes("antialias", false);
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  createCanvas(floor(windowWidth/cam.zoom)*cam.zoom, floor(windowHeight/cam.zoom)*cam.zoom, WEBGL);
   player = new Player(4, -4, playerSprite);
   level = level_manager.load(0);
   cam.calculateCameraStartPos(cam.modes.free);
@@ -55,8 +55,8 @@ function setup() {
   pixelatedBuffer = createFramebuffer({
     antialias: false,
     textureFiltering: NEAREST,
-    width: width / cam.zoom,
-    height: height / cam.zoom,
+    width: width / cam.zoom + 2, // adding 2 gives us an extra pixel on all sides to smooth the camera
+    height: height / cam.zoom + 2,
     pixelDensity: 10,
   });
   
@@ -81,7 +81,10 @@ function draw() {
   });
   clear();
   bg.draw();
-  image(pixelatedBuffer, -width/2, -height/2, width, height);
+  const subpixel_offset_x = cam.aabb.origin.x*8 - Math.floor(cam.aabb.origin.x*8);
+  const subpixel_offset_y = cam.aabb.origin.y*8 - Math.floor(cam.aabb.origin.y*8);
+
+  image(pixelatedBuffer, -width/2, -height/2, width, height, 1-subpixel_offset_x, 1-subpixel_offset_y, pixelatedBuffer.width - 2, pixelatedBuffer.height - 2);
   cam.transform();
   abilities.placer.highlight_grid_pos();
   level_editor.render_selection();  
