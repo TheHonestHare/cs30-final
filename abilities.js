@@ -3,6 +3,7 @@ const abilities = (() => {
     placed_array: [],
     index: null,
     current_ability_still_running: false,
+    begin_grid_pos: undefined,
     draw_states: {
       INACTIVE: 0,
       PRIMED: 1,
@@ -25,7 +26,20 @@ const abilities = (() => {
       onLeftClick() {
         if(!this.active) return;
         [x,y] = mouse.get_mouse_grid_pos();
-        const maybe_ability = this.selected_ability.try_to_place(createVector(x, y));
+        const click_pos = createVector(x, y);
+        const maybe_ability = this.selected_ability.try_to_place(click_pos);
+        if(maybe_ability === null) {
+          this.begin_grid_pos = click_pos;
+          return;
+        }
+        abilities.placed_array.push(maybe_ability);
+      },
+      onLeftRelease() {
+        if(!this.active || this.begin_grid_pos === undefined) return;
+        [x,y] = mouse.get_mouse_grid_pos();
+        const end_pos = createVector(x,y);
+        const maybe_ability = this.selected_ability.try_to_drag_place(this.begin_grid_pos, end_pos);
+        this.begin_grid_pos = undefined;
         if(maybe_ability === null) return;
         abilities.placed_array.push(maybe_ability);
       },
@@ -42,7 +56,8 @@ const abilities = (() => {
 
     preload() {
       this.Dash.preload();
-      this.placer.selected_ability = this.Dash;
+      this.Climb.preload();
+      this.placer.selected_ability = this.Climb;
     },
 
     draw() {
@@ -148,7 +163,7 @@ const abilities = (() => {
       }
     },
     Climb: class {
-      static sprites;
+      static sprites = [];
       static preload() {
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 0, 32, 8, 8)); // DOWN
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 8, 32, 8, 8)); // UP
@@ -167,15 +182,18 @@ const abilities = (() => {
       };
 
       // orient is of abilities.Climb.directions
-      constructor(begin_x, begin_y, orient, length) {
+      constructor(begin_x, begin_y, orient, length, dir) {
         this.begin_x = begin_x;
         this.begin_y = begin_y;
         this.orient = orient;
         this.length = length;
+        this.dir = dir;
       }
       static try_to_drag_place(begin_grid_pos, end_grid_pos) {
         let length;
         let orient;
+        let dir;
+        if(begin_grid_pos.x === end_grid_pos.x && begin_grid_pos.y === end_grid_pos.y) return null;
         if(Math.abs(end_grid_pos.x - begin_grid_pos.x) >= Math.abs(end_grid_pos.y - begin_grid_pos.y)) {
           // x direction
 
@@ -187,9 +205,9 @@ const abilities = (() => {
             // no block detected either up or down, failure
             return null;
           }
-          let dir = end_grid_pos.x > begin_grid_pos.x ? 1 : -1;
-          for(length = 2; begin_grid_pos.x + length * dir <= end_grid_pos.x; length++) {
-            const check_block_index = (begin_grid_pos.y+1*(orient === abilities.Climb.directions.DOWN ? 1 : -1)) * level.w + begin_grid_pos.x;
+          dir = end_grid_pos.x > begin_grid_pos.x ? 1 : -1;
+          for(length = 2; length <= Math.abs(end_grid_pos.x - begin_grid_pos.x); length++) {
+            const check_block_index = (begin_grid_pos.y+1*(orient === abilities.Climb.directions.DOWN ? 1 : -1)) * level.w + begin_grid_pos.x + length*dir;
             if(level.block_array[check_block_index]) continue;
 
             // TODO: allow 1 block climb?
@@ -206,9 +224,9 @@ const abilities = (() => {
             // no block detected either up or down, failure
             return null;
           }
-          let dir = end_grid_pos.y > begin_grid_pos.y ? 1 : -1;
-          for(length = 2; begin_grid_pos.y + length * dir <= end_grid_pos.y; length++) {
-            const check_block_index = begin_grid_pos.y * level.w + begin_grid_pos.x + 1*(orient === abilities.Climb.directions.RIGHT ? 1 : -1);
+          dir = end_grid_pos.y > begin_grid_pos.y ? 1 : -1;
+          for(length = 2; length <= Math.abs(end_grid_pos.y - begin_grid_pos.y); length++) {
+            const check_block_index = (begin_grid_pos.y+length*dir) * level.w + begin_grid_pos.x + 1*(orient === abilities.Climb.directions.RIGHT ? 1 : -1);
             if(level.block_array[check_block_index]) continue;
 
             // TODO: allow 1 block climb?
@@ -216,12 +234,28 @@ const abilities = (() => {
             break;
           }
         }
-        return new this(begin_grid_pos.x, begin_grid_pos.y, orient, length);
+        return new this(begin_grid_pos.x, begin_grid_pos.y, orient, length, dir);
       }
       draw(state) {
         const sprite_to_use = abilities.Climb.sprites[this.orient];
-        if(this.orient === abilities.Climb.directions.UP || this.orient === abilities.Climb.directions.DOWN) {
-          
+        let x_increment;
+        let y_increment;
+        switch(this.orient) {
+          case abilities.Climb.directions.DOWN:
+          case abilities.Climb.directions.UP: {
+            x_increment = this.dir;
+            y_increment = 0;
+            break;
+          }
+          case abilities.Climb.directions.LEFT:
+          case abilities.Climb.directions.RIGHT: {
+            x_increment = 0;
+            y_increment = this.dir;
+            break;
+          }
+        }
+        for(let i = 0; i < this.length; i++) {
+          sprite_to_use.draw(this.begin_x + x_increment*i, this.begin_y+y_increment*i, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
         }
       }
     }

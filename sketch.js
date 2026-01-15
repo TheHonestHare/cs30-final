@@ -127,6 +127,7 @@ function mousePressed() {
 }
 
 function mouseReleased(event) {
+  abilities.placer.onLeftRelease();
   level_editor.onMouseRelease(event.button === 0);
 }
 
