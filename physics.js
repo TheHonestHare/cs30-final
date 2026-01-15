@@ -181,7 +181,7 @@ const physics = (() => {
 
       // if distance to a vertical edge is too big we're obviously not on the ground
       const y_pos = thing.aabb.origin.y + thing.aabb.dims.y;
-      const mantissa = y_pos % 1;
+      const mantissa = (y_pos + Number.EPSILON) % 1;
       if(mantissa > Number.EPSILON) return false;
       
       // check each block under to see if there is one there
@@ -206,6 +206,40 @@ const physics = (() => {
       if(!between(x, -1, level.w)) return false;
       for(let y = Math.floor(thing.aabb.origin.y); y < Math.ceil(thing.aabb.origin.y + thing.aabb.dims.y); y++) {
         if(!between(y, -1, level.h)) continue;
+        if(level.block_array[y * level.w + x]) return true;
+      }
+      return false;
+    },
+    test_on_right_wall(thing) {
+      if(thing.aabb === undefined || thing.vel === undefined) return false;
+
+      // if distance to a horizontal edge is too big we're obviously not on the ground
+      const x_pos = thing.aabb.origin.x + thing.aabb.dims.x;
+      const mantissa = (x_pos+Number.EPSILON) % 1;
+      if(mantissa > Number.EPSILON) return false;
+      
+      // check each block under to see if there is one there
+      const x = Math.ceil(x_pos);
+      if(!between(x, -1, level.w)) return false;
+      for(let y = Math.floor(thing.aabb.origin.y); y < Math.ceil(thing.aabb.origin.y + thing.aabb.dims.y); y++) {
+        if(!between(y, -1, level.h)) continue;
+        if(level.block_array[y * level.w + x]) return true;
+      }
+      return false;
+    },
+    test_on_ceiling(thing) {
+      if(thing.aabb === undefined || thing.vel === undefined) return false;
+
+      // if distance to a vertical edge is too big we're obviously not on the ground
+      const y_pos = thing.aabb.origin.y;
+      const mantissa = y_pos % 1;
+      if(mantissa > Number.EPSILON) return false;
+      
+      // check each block under to see if there is one there
+      const y = Math.floor(y_pos-1);
+      if(!between(y, -1, level.h)) return false;
+      for(let x = Math.floor(thing.aabb.origin.x); x < Math.ceil(thing.aabb.origin.x + thing.aabb.dims.x); x++) {
+        if(!between(x, -1, level.w)) continue;
         if(level.block_array[y * level.w + x]) return true;
       }
       return false;
@@ -259,6 +293,9 @@ const physics = (() => {
       // update things state
       thing.onGround = physics.test_on_ground(thing);
       thing.onLeftWall = physics.test_on_left_wall(thing);
+      thing.onRightWall = physics.test_on_right_wall(thing);
+      thing.onCeiling = physics.test_on_ceiling(thing);
+      console.log(thing.onCeiling);
     }
   };
 })();
