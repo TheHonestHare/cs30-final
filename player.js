@@ -1,8 +1,8 @@
 class Player {
   constructor(x, y, sprite) {
-    this.JUMP_HEIGHT = 10;
-    this.TIME_TO_JUMP_APEX = 0.5;
-    this.APEX_HANG_MODIFIER = 0.2;
+    this.JUMP_HEIGHT = 6;
+    this.TIME_TO_JUMP_APEX = 0.3;
+    this.APEX_HANG_MODIFIER = 0.5;
     this.APEX_THRESHOLD = 0.4;
     this.HORIZONTAL_SPEED = 10;
     
