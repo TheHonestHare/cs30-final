@@ -57,7 +57,7 @@ function setup() {
     textureFiltering: NEAREST,
     width: width / cam.zoom + 2, // adding 2 gives us an extra pixel on all sides to smooth the camera
     height: height / cam.zoom + 2,
-    pixelDensity: 10,
+    pixelDensity: 1,
   });
   
 }
