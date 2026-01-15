@@ -295,7 +295,6 @@ const physics = (() => {
       thing.onLeftWall = physics.test_on_left_wall(thing);
       thing.onRightWall = physics.test_on_right_wall(thing);
       thing.onCeiling = physics.test_on_ceiling(thing);
-      console.log(thing.onCeiling);
     }
   };
 })();

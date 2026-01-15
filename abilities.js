@@ -92,7 +92,8 @@ const abilities = (() => {
     // draw(state)
     // static preload()
     // physics_tick(deltaT) bool   (returns true if the ability is still going)
-    // static try_to_place(click_pos) ?Ability
+    // static try_to_place(click_grid_pos) ?Ability
+    // static try_to_drag_place(begin_grid_pos, end_grid_pos) ?Ability
     // would_click_remove(click_pos) bool
     
     Dash: class {
@@ -107,6 +108,9 @@ const abilities = (() => {
       }
       static try_to_place(click_grid_pos) {
         return new this(click_grid_pos.x, click_grid_pos.y);
+      }
+      static try_to_drag_place(begin_grid_pos, end_grid_pos) {
+        return null;
       }
 
       constructor(x, y) {
@@ -141,6 +145,84 @@ const abilities = (() => {
         // TODO: add animations
         if(state === abilities.draw_states.INACTIVE) return;
         abilities.Dash.idle_sprite.draw(this.grid_pos.x, this.grid_pos.y, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
+      }
+    },
+    Climb: class {
+      static sprites;
+      static preload() {
+        abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 0, 32, 8, 8)); // DOWN
+        abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 8, 32, 8, 8)); // UP
+        abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 16, 32, 8, 8)); // LEFT
+        abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 24, 32, 8, 8)); // RIGHT
+      }
+      static try_to_place(click_grid_pos) {
+        return null;
+      }
+
+      static directions = {
+        DOWN: 0,
+        UP: 1,
+        LEFT: 2,
+        RIGHT: 3
+      };
+
+      // orient is of abilities.Climb.directions
+      constructor(begin_x, begin_y, orient, length) {
+        this.begin_x = begin_x;
+        this.begin_y = begin_y;
+        this.orient = orient;
+        this.length = length;
+      }
+      static try_to_drag_place(begin_grid_pos, end_grid_pos) {
+        let length;
+        let orient;
+        if(Math.abs(end_grid_pos.x - begin_grid_pos.x) >= Math.abs(end_grid_pos.y - begin_grid_pos.y)) {
+          // x direction
+
+          if(level.block_array[(begin_grid_pos.y + 1) * level.w + begin_grid_pos.x]) {
+            orient = abilities.Climb.directions.DOWN;
+          } else if(level.block_array[(begin_grid_pos.y-1) * level.w + begin_grid_pos.x]) {
+            orient = abilities.Climb.directions.UP;
+          } else {
+            // no block detected either up or down, failure
+            return null;
+          }
+          let dir = end_grid_pos.x > begin_grid_pos.x ? 1 : -1;
+          for(length = 2; begin_grid_pos.x + length * dir <= end_grid_pos.x; length++) {
+            const check_block_index = (begin_grid_pos.y+1*(orient === abilities.Climb.directions.DOWN ? 1 : -1)) * level.w + begin_grid_pos.x;
+            if(level.block_array[check_block_index]) continue;
+
+            // TODO: allow 1 block climb?
+            if(length === 2) return null;
+            break;
+          }
+        } else {
+          // y direction
+          if(level.block_array[begin_grid_pos.y * level.w + begin_grid_pos.x-1]) {
+            orient = abilities.Climb.directions.LEFT;
+          } else if(level.block_array[begin_grid_pos.y * level.w + begin_grid_pos.x+1]) {
+            orient = abilities.Climb.directions.RIGHT;
+          } else {
+            // no block detected either up or down, failure
+            return null;
+          }
+          let dir = end_grid_pos.y > begin_grid_pos.y ? 1 : -1;
+          for(length = 2; begin_grid_pos.y + length * dir <= end_grid_pos.y; length++) {
+            const check_block_index = begin_grid_pos.y * level.w + begin_grid_pos.x + 1*(orient === abilities.Climb.directions.RIGHT ? 1 : -1);
+            if(level.block_array[check_block_index]) continue;
+
+            // TODO: allow 1 block climb?
+            if(length === 2) return null;
+            break;
+          }
+        }
+        return new this(begin_grid_pos.x, begin_grid_pos.y, orient, length);
+      }
+      draw(state) {
+        const sprite_to_use = abilities.Climb.sprites[this.orient];
+        if(this.orient === abilities.Climb.directions.UP || this.orient === abilities.Climb.directions.DOWN) {
+          
+        }
       }
     }
 
