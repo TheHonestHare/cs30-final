@@ -188,6 +188,10 @@ const abilities = (() => {
         this.orient = orient;
         this.length = length;
         this.dir = dir;
+        const x_expanding = orient === abilities.Climb.directions.UP || abilities.Climb.directions.DOWN ? 1 : 0;
+        const y_expanding = !x_expanding;
+        const left_most = Math.min(begin_x, begin_x + length*dir*x_expanding);
+        const top_most = Math.min(begin_y, begin_y + length*dir*x_expanding);
       }
       static try_to_drag_place(begin_grid_pos, end_grid_pos) {
         let length;
