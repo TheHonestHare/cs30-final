@@ -201,7 +201,7 @@ class Player {
     }
     const context = this.climbContext;
     if(context.climbObject.isHorizontal()) {
-      if(this.keys.up) {
+      if(this.orient === abilities.Climb.directions.DOWN && this.keys.up) {
         this.climbDeactivate();
         this.jump();
         return;
