@@ -197,7 +197,8 @@ const abilities = (() => {
         let length;
         let orient;
         let dir;
-        if(begin_grid_pos.x === end_grid_pos.x && begin_grid_pos.y === end_grid_pos.y) return null;
+        if(begin_grid_pos.x === end_grid_pos.x && begin_grid_pos.y === end_grid_pos.y) return null; // prevent single block climb
+        if(level.block_array[begin_grid_pos.y * level.w + begin_grid_pos.x]) return null; // if starting in block, return
         if(Math.abs(end_grid_pos.x - begin_grid_pos.x) >= Math.abs(end_grid_pos.y - begin_grid_pos.y)) {
           // x direction
 
