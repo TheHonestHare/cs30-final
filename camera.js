@@ -31,17 +31,23 @@ const cam = {
     scale(8);
     let translation = this.aabb.origin.copy();
     
-    translation.sub(p5.Vector.div(this.aabb.dims, 2));
+    
     translation.mult(8);
     translation.x = Math.floor(translation.x);
     translation.y = Math.floor(translation.y);
     translation.mult(1/8);
+    const rounded_dims_x = (pixelatedBuffer.width-1) / 2 / 8;
+    const rounded_dims_y = (pixelatedBuffer.height-1) / 2 / 8;
+    // I have absolutely 0 clue why the 1/8s are required here but it broken without so I am keeping it in
+    translation.sub(rounded_dims_x-1/8, rounded_dims_y-1/8);
     translate(translation);
   },
   camera_debug_draw() {
     fill("yellow");
     circle(-this.aabb.origin.x+this.aabb.dims.x/2, -this.aabb.origin.y+this.aabb.dims.y/2, 1);
     circle(this.target.x, this.target.y, 1);
+    circle(-this.aabb.origin.x, -this.aabb.origin.y, 1);
+    circle(-this.aabb.origin.x+this.aabb.dims.x, -this.aabb.origin.y+this.aabb.dims.y, 1);
   },
   update(deltaT) {
     if(this.followMode === this.modes.fly) {

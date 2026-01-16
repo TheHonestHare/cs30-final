@@ -50,16 +50,14 @@ function setup() {
   createCanvas(floor(windowWidth/cam.zoom)*cam.zoom, floor(windowHeight/cam.zoom)*cam.zoom, WEBGL);
   player = new Player(4, -4, playerSprite);
   level = level_manager.load(0);
-  cam.calculateCameraStartPos(cam.modes.free);
-  
   pixelatedBuffer = createFramebuffer({
     antialias: false,
     textureFiltering: NEAREST,
-    width: width / cam.zoom + 2, // adding 2 gives us an extra pixel on all sides to smooth the camera
-    height: height / cam.zoom + 2,
+    width: Math.floor(width / cam.zoom) + 1, // adding 1 on each side allows us to offset the "real" camera by subpixel movements
+    height: Math.floor(height / cam.zoom) + 1,
     pixelDensity: 1,
   });
-  
+  cam.calculateCameraStartPos(cam.modes.free);
 }
 
 function draw() {
@@ -67,12 +65,13 @@ function draw() {
   player.process_input();
   player.physics_tick(deltaTime / 1000);
   abilities.physics_tick(deltaTime / 1000);
+  cam.update(deltaTime / 1000);
+
+  noStroke();
   
   pixelatedBuffer.draw(() => {
     push();
     clear();
-    noStroke();
-    cam.update(deltaTime / 1000);
     cam.transform_pixelated();
     level.draw();
     player.draw();
@@ -81,14 +80,15 @@ function draw() {
   });
   clear();
   bg.draw();
-  const subpixel_offset_x = cam.aabb.origin.x*8 - Math.floor(cam.aabb.origin.x*8);
-  const subpixel_offset_y = cam.aabb.origin.y*8 - Math.floor(cam.aabb.origin.y*8);
+  const subpixel_offset_x =  Math.floor(cam.aabb.origin.x*8) - cam.aabb.origin.x*8;
+  const subpixel_offset_y =  Math.floor(cam.aabb.origin.y*8) - cam.aabb.origin.y*8;
 
-  image(pixelatedBuffer, -width/2, -height/2, width, height, 1-subpixel_offset_x, 1-subpixel_offset_y, pixelatedBuffer.width - 2, pixelatedBuffer.height - 2);
+  image(pixelatedBuffer, -width/2, -height/2, width, height, subpixel_offset_x+1, subpixel_offset_y+1, cam.aabb.dims.x*8, cam.aabb.dims.y*8);
+  //console.log(`${cam.aabb.origin.x},${cam.aabb.origin.y}`)
   cam.transform();
   abilities.placer.highlight_grid_pos();
   level_editor.render_selection();  
-  // cam.camera_debug_draw();
+  //cam.camera_debug_draw();
 }
 
 function keyPressed() {
