@@ -165,6 +165,7 @@ const abilities = (() => {
     },
     Climb: class {
       static sprites = [];
+      static max_speed = 50;
       static preload() {
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 0, 32, 8, 8)); // DOWN
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 8, 32, 8, 8)); // UP

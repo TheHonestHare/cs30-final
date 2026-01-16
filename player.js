@@ -5,6 +5,7 @@ class Player {
     this.APEX_HANG_MODIFIER = 0.5;
     this.APEX_THRESHOLD = 0.4;
     this.HORIZONTAL_SPEED = 10;
+    this.MAX_FALL_SPEED = 40;
     
     this.aabb = new physics.AABB(createVector(x, y), createVector(2, 2));
     this.vel = createVector(0, 1);
@@ -62,6 +63,7 @@ class Player {
         this.decelerateJump = false;
       }
     }
+    this.vel.y = clamp(this.vel.y, -Infinity, this.MAX_FALL_SPEED);
   }
 
   jump() {
@@ -201,7 +203,7 @@ class Player {
     }
     const context = this.climbContext;
     if(context.climbObject.isHorizontal()) {
-      if(this.orient === abilities.Climb.directions.DOWN && this.keys.up) {
+      if(context.climbObject.orient === abilities.Climb.directions.DOWN && this.keys.up) {
         this.climbDeactivate();
         this.jump();
         return;
@@ -210,14 +212,14 @@ class Player {
       if(this.keys.left === this.keys.right) {
         this.vel.x = 0;
       } else {
-        player.vel.x = clamp(Math.abs(player.vel.x) + 100 * deltaT, 10, 100) * (this.keys.right ? 1 : -1);
+        player.vel.x = clamp(Math.abs(player.vel.x) + 100 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
       }
     } else {
       this.vel.x = 0;
       if(this.keys.up === this.keys.down) {
         this.vel.y = 0;
       } else {
-        player.vel.y = clamp(Math.abs(player.vel.y) + 100 * deltaT, 10, 100) * (this.keys.down ? 1 : -1);
+        player.vel.y = clamp(Math.abs(player.vel.y) + 100 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.down ? 1 : -1);
       }
     }
   }
