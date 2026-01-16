@@ -16,10 +16,14 @@ class Player {
       down: false,
       left: false,
       right: false,
+      activate: false,
     };
+
     this.onGround = false;
     this.executingJump = false;
+    this.decelerateJump = false;
     this.executingDash = false;
+    this.executingClimb = false;
     this.ignoreInput = false;
     this.dashContext = {
       dash_direction: null,
@@ -27,6 +31,11 @@ class Player {
       time_of_activation: 0,
       deactivateCallback: null,
       originatingOrb: null,
+    };
+    this.climbContext = {
+      time_of_activation: 0,
+      climbObject: null,
+      deactivateCallback: null,
     };
 
     this.sprite = sprite;
@@ -46,11 +55,18 @@ class Player {
     const is_at_apex = Math.abs(this.vel.y) < this.APEX_THRESHOLD;
     const gravity = 2 * this.JUMP_HEIGHT / (this.TIME_TO_JUMP_APEX * this.TIME_TO_JUMP_APEX) * (is_at_apex ? this.APEX_HANG_MODIFIER : 1);
     this.vel.add(createVector(0, gravity).mult(deltaT)); 
-    if(!this.executingJump && this.vel.y < 0) this.vel.y *= 0.30;
+    if(this.decelerateJump && this.executingJump) {
+      if(this.vel.y < 0) {
+        this.vel.y *= 0.30;
+      } else {
+        this.decelerateJump = false;
+      }
+    }
   }
 
   jump() {
     this.executingJump = true;
+    this.decelerateJump = false;
     this.vel.y = -2 * this.JUMP_HEIGHT / this.TIME_TO_JUMP_APEX;
     console.log("jump");
   }
@@ -59,19 +75,24 @@ class Player {
     if(this.executingDash) {
       this.dashPhysicsTick(deltaT);
       return;
+    } else if(this.executingClimb) {
+      this.climbPhysicsTick(deltaT);
+      physics.do_collisions(this, deltaT);
+      return;
     } else if(this.onGround) {
       this.vel.y = 0;
+      this.executingJump = false;
     } else {
       this.applyGravity(deltaT);
     }
     
     if(!this.ignoreInput) {
-      if(this.executingJump && !this.keys.up) this.executingJump = false;
-      if(this.keys.up && this.onGround && !this.executingJump) this.jump();
+      if(this.executingJump && !this.keys.up) this.decelerateJump = true;
+      if(this.keys.up && this.onGround) this.jump();
       if(this.keys.left === this.keys.right) {
         this.vel.x = 0;
       } else {
-        this.vel.x = this.HORIZONTAL_SPEED * (this.keys.right ? 1 : -1);
+        this.vel.x = Math.max(Math.abs(this.vel.x), this.HORIZONTAL_SPEED) * (this.keys.right ? 1 : -1);
       }
     }
     
@@ -140,6 +161,67 @@ class Player {
     }
   }
 
+  climbActivate(deactivateCallback, climbObject) {
+    this.executingJump = false;
+    this.climbContext.climbObject = climbObject;
+    this.climbContext.deactivateCallback = deactivateCallback;
+    this.executingClimb = true;
+    // snapping player
+    switch(climbObject.orient) {
+      case abilities.Climb.directions.DOWN: {
+        this.aabb.origin.y = climbObject.activate_box.origin.y - 1;
+        break;
+      }
+      case abilities.Climb.directions.UP: {
+        this.aabb.origin.y = climbObject.activate_box.origin.y;
+        break;
+      }
+      case abilities.Climb.directions.LEFT: {
+        this.aabb.origin.x = climbObject.activate_box.origin.x;
+        break;
+      }
+      case abilities.Climb.directions.RIGHT: {
+        this.aabb.origin.x = climbObject.activate_box.origin.x - 1;
+        break;
+      }
+    }
+    this.vel = createVector(0,0);
+  }
+
+  climbDeactivate() {
+    this.executingClimb = false;
+    this.climbContext.climbObject.done = true;
+    this.climbContext.deactivateCallback();
+  }
+
+  climbPhysicsTick(deltaT) {
+    if(!this.keys.activate) {
+      this.climbDeactivate();
+      return;
+    }
+    const context = this.climbContext;
+    if(context.climbObject.isHorizontal()) {
+      if(this.keys.up) {
+        this.climbDeactivate();
+        this.jump();
+        return;
+      }
+      this.vel.y = 0;
+      if(this.keys.left === this.keys.right) {
+        this.vel.x = 0;
+      } else {
+        player.vel.x = clamp(Math.abs(player.vel.x) + 100 * deltaT, 10, 100) * (this.keys.right ? 1 : -1);
+      }
+    } else {
+      this.vel.x = 0;
+      if(this.keys.up === this.keys.down) {
+        this.vel.y = 0;
+      } else {
+        player.vel.y = clamp(Math.abs(player.vel.y) + 100 * deltaT, 10, 100) * (this.keys.down ? 1 : -1);
+      }
+    }
+  }
+
   respawn() {
     this.vel = createVector(0, 0);
     this.aabb.origin = level.scene_items[0].aabb.origin.copy();
@@ -148,10 +230,10 @@ class Player {
   
   process_input() {
     this.keys.up = keyIsDown("W".charCodeAt(0));
-
     this.keys.down = keyIsDown("S".charCodeAt(0));
     this.keys.left = keyIsDown("A".charCodeAt(0));
     this.keys.right = keyIsDown("D".charCodeAt(0));
+    this.keys.activate = keyIsDown("J".charCodeAt(0));
 
     if(keyIsDown(" ".charCodeAt(0))) {
       console.log(`x: ${this.aabb.origin.x}, y: ${this.aabb.origin.y}, vel.x: ${this.vel.x}, vel.y: ${this.vel.y}`);

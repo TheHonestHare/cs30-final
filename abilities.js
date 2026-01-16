@@ -141,6 +141,7 @@ const abilities = (() => {
         if(!this.activate_box.is_overlapping_aabb(player.aabb)) return false;
 
         console.log("player is dashing");
+        this.done = false;
         player.dashActivate(abilities.Dash.deactivate(this), this);
         return true;
       }
@@ -173,26 +174,12 @@ const abilities = (() => {
       static try_to_place(click_grid_pos) {
         return null;
       }
-
       static directions = {
         DOWN: 0,
         UP: 1,
         LEFT: 2,
         RIGHT: 3
       };
-
-      // orient is of abilities.Climb.directions
-      constructor(begin_x, begin_y, orient, length, dir) {
-        this.begin_x = begin_x;
-        this.begin_y = begin_y;
-        this.orient = orient;
-        this.length = length;
-        this.dir = dir;
-        const x_expanding = orient === abilities.Climb.directions.UP || abilities.Climb.directions.DOWN ? 1 : 0;
-        const y_expanding = !x_expanding;
-        const left_most = Math.min(begin_x, begin_x + length*dir*x_expanding);
-        const top_most = Math.min(begin_y, begin_y + length*dir*x_expanding);
-      }
       static try_to_drag_place(begin_grid_pos, end_grid_pos) {
         let length;
         let orient;
@@ -211,12 +198,12 @@ const abilities = (() => {
             return null;
           }
           dir = end_grid_pos.x > begin_grid_pos.x ? 1 : -1;
-          for(length = 2; length <= Math.abs(end_grid_pos.x - begin_grid_pos.x); length++) {
+          for(length = 1; length <= Math.abs(end_grid_pos.x - begin_grid_pos.x); length++) {
             const check_block_index = (begin_grid_pos.y+1*(orient === abilities.Climb.directions.DOWN ? 1 : -1)) * level.w + begin_grid_pos.x + length*dir;
             if(level.block_array[check_block_index]) continue;
 
             // TODO: allow 1 block climb?
-            if(length === 2) return null;
+            if(length === 1) return null;
             break;
           }
         } else {
@@ -230,38 +217,67 @@ const abilities = (() => {
             return null;
           }
           dir = end_grid_pos.y > begin_grid_pos.y ? 1 : -1;
-          for(length = 2; length <= Math.abs(end_grid_pos.y - begin_grid_pos.y); length++) {
+          for(length = 1; length <= Math.abs(end_grid_pos.y - begin_grid_pos.y); length++) {
             const check_block_index = (begin_grid_pos.y+length*dir) * level.w + begin_grid_pos.x + 1*(orient === abilities.Climb.directions.RIGHT ? 1 : -1);
             if(level.block_array[check_block_index]) continue;
 
             // TODO: allow 1 block climb?
-            if(length === 2) return null;
+            if(length === 1) return null;
             break;
           }
         }
         return new this(begin_grid_pos.x, begin_grid_pos.y, orient, length, dir);
       }
+
+      // orient is of abilities.Climb.directions
+      constructor(begin_x, begin_y, orient, length, dir) {
+        this.begin_x = begin_x;
+        this.begin_y = begin_y;
+        this.orient = orient;
+        this.length = length;
+        this.dir = dir;
+        const x_expanding = this.isHorizontal() ? 1 : 0;
+        const y_expanding = !x_expanding;
+        const left_most = Math.min(begin_x, begin_x + length*dir*x_expanding);
+        const top_most = Math.min(begin_y, begin_y + length*dir*y_expanding + 1);
+        const dim_x = Math.max(1, length * x_expanding);
+        const dim_y = Math.max(1, length * y_expanding);
+        this.activate_box = new physics.AABB(createVector(left_most, top_most), createVector(dim_x, dim_y));
+        this.done = false;
+      }
+
+      isHorizontal() {
+        return this.orient === abilities.Climb.directions.UP || this.orient === abilities.Climb.directions.DOWN;
+      }
+      
       draw(state) {
+        if(state === abilities.draw_states.INACTIVE) return;
         const sprite_to_use = abilities.Climb.sprites[this.orient];
         let x_increment;
         let y_increment;
-        switch(this.orient) {
-          case abilities.Climb.directions.DOWN:
-          case abilities.Climb.directions.UP: {
-            x_increment = this.dir;
-            y_increment = 0;
-            break;
-          }
-          case abilities.Climb.directions.LEFT:
-          case abilities.Climb.directions.RIGHT: {
-            x_increment = 0;
-            y_increment = this.dir;
-            break;
-          }
+        if(this.isHorizontal()) {
+          x_increment = this.dir;
+          y_increment = 0;
+        } else {
+          x_increment = 0;
+          y_increment = this.dir;
         }
         for(let i = 0; i < this.length; i++) {
           sprite_to_use.draw(this.begin_x + x_increment*i, this.begin_y+y_increment*i, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
         }
+      }
+      activate() {
+        if(!this.activate_box.is_overlapping_aabb(player.aabb)) return false;
+        console.log("player is climbing");
+        this.done = false;
+        player.climbActivate(()=>{}, this);
+        return true;
+      }
+      physics_tick(deltaT) {
+        if(this.done) {
+          console.log("player finished climbing");
+        }
+        return !this.done;
       }
     }
 
