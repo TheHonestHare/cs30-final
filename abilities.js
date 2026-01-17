@@ -115,7 +115,7 @@ const abilities = (() => {
       static idle_sprite;
       static lightning_sprite;
 
-      static dash_speed = 60;
+      static dash_speed = 50;
       static total_dash_length = 0.2;
       static preload() {
         this.idle_sprite = new material.Sprite(miscSpriteSheet, 0, 8, 8, 8);

@@ -4,8 +4,11 @@ class Player {
     this.TIME_TO_JUMP_APEX = 0.3;
     this.APEX_HANG_MODIFIER = 0.5;
     this.APEX_THRESHOLD = 0.4;
-    this.HORIZONTAL_SPEED = 10;
+    this.HORIZONTAL_SPEED = 12;
     this.MAX_FALL_SPEED = 40;
+    this.GROUND_ACCEL = 20;
+    this.AIR_DEFRICTION_FRACTOR = 0.5;
+    this.GROUND_DECEL = 3;
     
     this.aabb = new physics.AABB(createVector(x, y), createVector(2, 2));
     this.vel = createVector(0, 1);
@@ -90,11 +93,17 @@ class Player {
     if(!this.ignoreInput) {
       if(this.executingJump && !this.keys.up) this.decelerateJump = true;
       if(this.keys.up && this.onGround) this.jump();
-      if(this.keys.left === this.keys.right) {
-        this.vel.x = 0;
+      
+      const x_dir = this.keys.right - this.keys.left;
+      if(Math.abs(this.vel.x) <= this.HORIZONTAL_SPEED) {
+        // accelerating player to desired vel
+        this.vel.x = lerp(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_ACCEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
       } else {
-        this.vel.x = Math.max(Math.abs(this.vel.x), this.HORIZONTAL_SPEED) * (this.keys.right ? 1 : -1);
+        // decelerating player to desired vel
+        this.vel.x = lerp(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_DECEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
       }
+      
+      
     }
     
     
@@ -211,16 +220,16 @@ class Player {
       if(this.keys.left === this.keys.right) {
         this.vel.x = 0;
       } else {
-        player.vel.x = clamp(Math.abs(player.vel.x) + 50 * deltaT, 0, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
+        player.vel.x = clamp(Math.abs(player.vel.x) + 150 * deltaT, 0, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
       }
     } else {
       if(context.climbObject.orient === abilities.Climb.directions.LEFT && this.keys.right) {
         this.climbDeactivate();
-        this.vel.x = this.HORIZONTAL_SPEED*2;
+        this.vel.x = this.HORIZONTAL_SPEED * 1.5;
         return;
       } else if(context.climbObject.orient === abilities.Climb.directions.RIGHT && this.keys.left) {
         this.climbDeactivate();
-        this.vel.x = -this.HORIZONTAL_SPEED*2;
+        this.vel.x = -this.HORIZONTAL_SPEED * 1.5;
         return;
       }
       this.vel.x = 0;
