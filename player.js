@@ -79,7 +79,6 @@ class Player {
       return;
     } else if(this.executingClimb) {
       this.climbPhysicsTick(deltaT);
-      physics.do_collisions(this, deltaT);
       return;
     } else if(this.onGround) {
       this.vel.y = 0;
@@ -222,6 +221,8 @@ class Player {
         player.vel.y = clamp(Math.abs(player.vel.y) + 100 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.down ? 1 : -1);
       }
     }
+    physics.do_collisions(this, deltaT);
+    
   }
 
   respawn() {

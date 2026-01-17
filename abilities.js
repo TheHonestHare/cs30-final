@@ -200,8 +200,10 @@ const abilities = (() => {
           }
           dir = end_grid_pos.x > begin_grid_pos.x ? 1 : -1;
           for(length = 1; length <= Math.abs(end_grid_pos.x - begin_grid_pos.x); length++) {
-            const check_block_index = (begin_grid_pos.y+1*(orient === abilities.Climb.directions.DOWN ? 1 : -1)) * level.w + begin_grid_pos.x + length*dir;
-            if(level.block_array[check_block_index]) continue;
+            const curr_block_index = begin_grid_pos.y * level.w + begin_grid_pos.x + length*dir;
+            const below_block_index = curr_block_index + (orient === abilities.Climb.directions.DOWN ? 1 : -1) * level.w;
+            if(level.block_array[curr_block_index]) break;
+            if(level.block_array[below_block_index]) continue;
 
             // TODO: allow 1 block climb?
             if(length === 1) return null;
@@ -219,8 +221,10 @@ const abilities = (() => {
           }
           dir = end_grid_pos.y > begin_grid_pos.y ? 1 : -1;
           for(length = 1; length <= Math.abs(end_grid_pos.y - begin_grid_pos.y); length++) {
-            const check_block_index = (begin_grid_pos.y+length*dir) * level.w + begin_grid_pos.x + 1*(orient === abilities.Climb.directions.RIGHT ? 1 : -1);
-            if(level.block_array[check_block_index]) continue;
+            const curr_block_index = (begin_grid_pos.y+length*dir) * level.w + begin_grid_pos.x;
+            const below_block_index =  curr_block_index + (orient === abilities.Climb.directions.RIGHT ? 1 : -1);
+            if(level.block_array[curr_block_index]) break;
+            if(level.block_array[below_block_index]) continue;
 
             // TODO: allow 1 block climb?
             if(length === 1) return null;
