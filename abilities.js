@@ -165,7 +165,11 @@ const abilities = (() => {
     },
     Climb: class {
       static sprites = [];
-      static max_speed = 50;
+      static MAX_SPEED_H = 60;
+      static MAX_SPEED_V = 60;
+      static HORIZONTAL_RAMPUP = 150;
+      static VERTICAL_RAMPUP = 125;
+      static FLING_GRACE_TIME = 0.1;
       static preload() {
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 0, 32, 8, 8)); // DOWN
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 8, 32, 8, 8)); // UP
@@ -243,7 +247,7 @@ const abilities = (() => {
         this.dir = dir;
         const x_expanding = this.isHorizontal() ? 1 : 0;
         const y_expanding = !x_expanding;
-        const left_most = Math.min(begin_x, begin_x + length*dir*x_expanding);
+        const left_most = Math.min(begin_x, begin_x + length*dir*x_expanding+1);
         const top_most = Math.min(begin_y, begin_y + length*dir*y_expanding + 1);
         const dim_x = Math.max(1, length * x_expanding);
         const dim_y = Math.max(1, length * y_expanding);

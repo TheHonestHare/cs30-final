@@ -141,3 +141,8 @@ function pixelAlignVector(coords) {
   const y = Math.floor(coords.y * 8) / 8;
   return createVector(x, y);
 }
+
+// taken from monacle game engine
+function approach(val, target, maxChange) {
+  return val > target ? Math.max(val - maxChange, target) : Math.min(val + maxChange, target);
+}

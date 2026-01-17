@@ -40,6 +40,8 @@ class Player {
       time_of_activation: 0,
       climbObject: null,
       deactivateCallback: null,
+      storedSpeed: null,
+      flingGraceTime: 0,
     };
 
     this.sprite = sprite;
@@ -199,30 +201,54 @@ class Player {
   }
 
   climbDeactivate() {
+    const context = this.climbContext;
+    if(context.storedSpeed !== null) {
+      if(context.climbObject.isHorizontal()) {
+        this.vel.x = context.storedSpeed;
+        console.log(this.vel.x) 
+      } else {
+        this.vel.y = context.storedSpeed;
+      }
+    }
     this.executingClimb = false;
-    this.climbContext.climbObject.done = true;
-    this.climbContext.deactivateCallback();
+    context.climbObject.done = true;
+    context.deactivateCallback();
+    context.flingGraceTime = 0;
+    context.storedSpeed = null;
   }
 
   climbPhysicsTick(deltaT) {
+    const context = this.climbContext;
+    context.flingGraceTime -= deltaT;
+
+    if(context.flingGraceTime <= 0) {
+      context.flingGraceTime = 0;
+      context.storedSpeed = null;
+      console.log("reset")
+    }
     if(!this.keys.activate) {
       this.climbDeactivate();
       return;
     }
-    const context = this.climbContext;
+
     if(context.climbObject.isHorizontal()) {
+      // fling
       if(context.climbObject.orient === abilities.Climb.directions.DOWN && this.keys.up) {
         this.climbDeactivate();
         this.jump();
         return;
       }
+      // normal movement
       this.vel.y = 0;
       if(this.keys.left === this.keys.right) {
         this.vel.x = 0;
       } else {
-        player.vel.x = clamp(Math.abs(player.vel.x) + 150 * deltaT, 0, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
+        const x_dir = this.keys.right-this.keys.left;
+        player.vel.x = approach(player.vel.x , abilities.Climb.MAX_SPEED_H * x_dir, abilities.Climb.HORIZONTAL_RAMPUP * deltaT);
       }
     } else {
+
+      // fling
       if(context.climbObject.orient === abilities.Climb.directions.LEFT && this.keys.right) {
         this.climbDeactivate();
         this.vel.x = this.HORIZONTAL_SPEED * 1.5;
@@ -232,15 +258,54 @@ class Player {
         this.vel.x = -this.HORIZONTAL_SPEED * 1.5;
         return;
       }
+      
+      // normal movement
       this.vel.x = 0;
       if(this.keys.up === this.keys.down) {
         this.vel.y = 0;
       } else {
-        player.vel.y = clamp(Math.abs(player.vel.y) + 125 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.down ? 1 : -1);
+        const y_dir = this.keys.down-this.keys.up;
+        player.vel.y = approach(Math.max(Math.abs(player.vel.y), this.HORIZONTAL_SPEED)*y_dir , abilities.Climb.MAX_SPEED_V*y_dir, abilities.Climb.VERTICAL_RAMPUP * deltaT);
       }
     }
-    physics.do_collisions(this, deltaT);
     
+    // do physics move
+    physics.do_collisions(this, deltaT);
+
+    // stop the player from leaving ability
+    if(context.climbObject.isHorizontal()) {
+      let went_out;
+      if(this.aabb.origin.x > context.climbObject.activate_box.origin.x + context.climbObject.activate_box.dims.x) {
+        went_out = true;
+        this.aabb.origin.x = context.climbObject.activate_box.origin.x + context.climbObject.activate_box.dims.x;
+      } else if(this.aabb.origin.x + this.aabb.dims.x < context.climbObject.activate_box.origin.x) {
+        went_out = true;
+        this.aabb.origin.x = -this.aabb.dims.x + context.climbObject.activate_box.origin.x;
+      }
+      if(went_out) {
+        if(context.storedSpeed === null) {
+          context.storedSpeed = this.vel.x;
+          context.flingGraceTime = abilities.Climb.FLING_GRACE_TIME;
+        }
+        this.vel.x = 0;
+      }
+    } else {
+      let went_out = false;
+      if(this.aabb.origin.y > context.climbObject.activate_box.origin.y + context.climbObject.activate_box.dims.y) {
+        went_out = true;
+        this.aabb.origin.y = context.climbObject.activate_box.origin.y + context.climbObject.activate_box.dims.y;
+      } else if(this.aabb.origin.y + this.aabb.dims.y < context.climbObject.activate_box.origin.y) {
+        went_out = true;
+        this.aabb.origin.y = -this.aabb.dims.y + context.climbObject.activate_box.origin.y;
+      }
+      if(went_out) {
+        if(context.storedSpeed === null) {
+          context.storedSpeed = this.vel.y;
+          context.flingGraceTime = abilities.Climb.FLING_GRACE_TIME;
+        }
+        this.vel.y = 0;
+      }
+    }
   }
 
   respawn() {
