@@ -211,14 +211,23 @@ class Player {
       if(this.keys.left === this.keys.right) {
         this.vel.x = 0;
       } else {
-        player.vel.x = clamp(Math.abs(player.vel.x) + 100 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
+        player.vel.x = clamp(Math.abs(player.vel.x) + 50 * deltaT, 0, abilities.Climb.max_speed) * (this.keys.right ? 1 : -1);
       }
     } else {
+      if(context.climbObject.orient === abilities.Climb.directions.LEFT && this.keys.right) {
+        this.climbDeactivate();
+        this.vel.x = this.HORIZONTAL_SPEED*2;
+        return;
+      } else if(context.climbObject.orient === abilities.Climb.directions.RIGHT && this.keys.left) {
+        this.climbDeactivate();
+        this.vel.x = -this.HORIZONTAL_SPEED*2;
+        return;
+      }
       this.vel.x = 0;
       if(this.keys.up === this.keys.down) {
         this.vel.y = 0;
       } else {
-        player.vel.y = clamp(Math.abs(player.vel.y) + 100 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.down ? 1 : -1);
+        player.vel.y = clamp(Math.abs(player.vel.y) + 125 * deltaT, this.HORIZONTAL_SPEED, abilities.Climb.max_speed) * (this.keys.down ? 1 : -1);
       }
     }
     physics.do_collisions(this, deltaT);
