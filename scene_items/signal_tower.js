@@ -15,6 +15,7 @@ class SignalTower {
     if(this.intersecting_player !== now_intersecting_player) {
       now_intersecting_player ? abilities.placer.enter() : abilities.placer.exit();
       this.intersecting_player = now_intersecting_player;
+      abilities.power_level = this.energy_level;
     }
   }
   draw() {

@@ -1,14 +1,16 @@
 const abilities = (() => {
   return {
     placed_array: [],
+    power_level: 0,
     index: null,
     current_ability_still_running: false,
     begin_grid_pos: undefined,
     draw_states: {
       INACTIVE: 0,
       PRIMED: 1,
-      ACTIVE: 2,
-      ICON: 3,
+      DEPOWERED_PRIMED: 2,
+      ACTIVE: 3,
+      ICON: 4,
     },
     placer: {
       active: false,
@@ -68,23 +70,26 @@ const abilities = (() => {
         return;
       }
       if(this.index === null) {
-        if(this.placed_array.length > 0) this.placed_array[0].draw(abilities.draw_states.PRIMED);
+        if(this.placed_array.length > 0) this.placed_array[0].draw(abilities.power_level <= 0 ? abilities.draw_states.DEPOWERED_PRIMED : abilities.draw_states.PRIMED);
         return;
       }
 
       for(let i = 0; i < this.placed_array.length; i++) {
         let draw_state = abilities.draw_states.INACTIVE;
-        if(i - this.index === 1) draw_state = abilities.draw_states.PRIMED;
+        if(i - this.index === 1) draw_state = abilities.power_level <= 0 ? abilities.draw_states.DEPOWERED_PRIMED : abilities.draw_states.PRIMED;
         if(i === this.index && abilities.current_ability_still_running) draw_state = abilities.draw_states.ACTIVE;
+        
         this.placed_array[i].draw(draw_state);
       }
     },
     activate() {
       if(this.placer.active) return;
+      if(this.power_level <= 0) return;
       if(this.index === null) {
         if(this.placed_array.length === 0) return;
         this.index = 0;
         this.current_ability_still_running = this.placed_array[this.index].activate();
+        if(this.current_ability_still_running) abilities.power_level = Math.max(0, abilities.power_level-1);
         return;
       }
       if(this.index >= this.placed_array.length-1) {
@@ -94,6 +99,7 @@ const abilities = (() => {
       if(this.current_ability_still_running) this.placed_array[this.index].deactivate();
       this.index += 1;
       this.current_ability_still_running = this.placed_array[this.index].activate();
+      if(this.current_ability_still_running) abilities.power_level = Math.max(0, abilities.power_level-1);
     },
 
     physics_tick(deltaT) {
@@ -114,12 +120,14 @@ const abilities = (() => {
     Dash: class {
       static idle_sprite;
       static lightning_sprite;
+      static depowered_sprite;
 
       static dash_speed = 50;
       static total_dash_length = 0.2;
       static preload() {
         this.idle_sprite = new material.Sprite(miscSpriteSheet, 0, 8, 8, 8);
         this.lightning_sprite = new material.Sprite(miscSpriteSheet, 0, 16, 32, 8);
+        this.depowered_sprite = new material.Sprite(miscSpriteSheet, 8, 8, 8, 8);
       }
       static try_to_place(click_grid_pos) {
         return new this(click_grid_pos.x, click_grid_pos.y);
@@ -160,11 +168,16 @@ const abilities = (() => {
       draw(state) {
         // TODO: add animations
         if(state === abilities.draw_states.INACTIVE) return;
-        abilities.Dash.idle_sprite.draw(this.grid_pos.x, this.grid_pos.y, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
+        if(state === abilities.draw_states.DEPOWERED_PRIMED) {
+          abilities.Dash.depowered_sprite.draw(this.grid_pos.x, this.grid_pos.y, 1, 1, 128);
+        } else {
+          abilities.Dash.idle_sprite.draw(this.grid_pos.x, this.grid_pos.y, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
+        }
       }
     },
     Climb: class {
       static sprites = [];
+      static depoweredSprites = [];
       static MAX_SPEED_H = 60;
       static MAX_SPEED_V = 60;
       static HORIZONTAL_RAMPUP = 150;
@@ -175,6 +188,11 @@ const abilities = (() => {
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 8, 32, 8, 8)); // UP
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 16, 32, 8, 8)); // LEFT
         abilities.Climb.sprites.push(new material.Sprite(miscSpriteSheet, 24, 32, 8, 8)); // RIGHT
+
+        abilities.Climb.depoweredSprites.push(new material.Sprite(miscSpriteSheet, 0, 40, 8, 8)); // DOWN
+        abilities.Climb.depoweredSprites.push(new material.Sprite(miscSpriteSheet, 8, 40, 8, 8)); // UP
+        abilities.Climb.depoweredSprites.push(new material.Sprite(miscSpriteSheet, 16, 40, 8, 8)); // LEFT
+        abilities.Climb.depoweredSprites.push(new material.Sprite(miscSpriteSheet, 24, 40, 8, 8)); // RIGHTabilities.Climb.depoweredSprites.push()
       }
       static try_to_place(click_grid_pos) {
         return null;
@@ -261,7 +279,8 @@ const abilities = (() => {
       
       draw(state) {
         if(state === abilities.draw_states.INACTIVE) return;
-        const sprite_to_use = abilities.Climb.sprites[this.orient];
+        const sprite_to_use = (state === abilities.draw_states.DEPOWERED_PRIMED ? abilities.Climb.depoweredSprites : abilities.Climb.sprites)[this.orient];
+        const opacity = state === abilities.draw_states.DEPOWERED_PRIMED || state === abilities.draw_states.PRIMED ? 128 : 255;
         let x_increment;
         let y_increment;
         if(this.isHorizontal()) {
@@ -272,7 +291,7 @@ const abilities = (() => {
           y_increment = this.dir;
         }
         for(let i = 0; i < this.length; i++) {
-          sprite_to_use.draw(this.begin_x + x_increment*i, this.begin_y+y_increment*i, 1, 1, state === abilities.draw_states.PRIMED ? 128 : 255);
+          sprite_to_use.draw(this.begin_x + x_increment*i, this.begin_y+y_increment*i, 1, 1, opacity);
         }
       }
       activate() {
