@@ -6,9 +6,9 @@ class Player {
     this.APEX_THRESHOLD = 0.4;
     this.HORIZONTAL_SPEED = 12;
     this.MAX_FALL_SPEED = 40;
-    this.GROUND_ACCEL = 20;
-    this.AIR_DEFRICTION_FRACTOR = 0.5;
-    this.GROUND_DECEL = 3;
+    this.GROUND_ACCEL = 150;
+    this.AIR_DEFRICTION_FRACTOR = 0.75;
+    this.GROUND_DECEL = 60;
     
     this.aabb = new physics.AABB(createVector(x, y), createVector(2, 2));
     this.vel = createVector(0, 1);
@@ -99,10 +99,10 @@ class Player {
       const x_dir = this.keys.right - this.keys.left;
       if(Math.abs(this.vel.x) <= this.HORIZONTAL_SPEED) {
         // accelerating player to desired vel
-        this.vel.x = lerp(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_ACCEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
+        this.vel.x = approach(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_ACCEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
       } else {
         // decelerating player to desired vel
-        this.vel.x = lerp(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_DECEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
+        this.vel.x = approach(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_DECEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
       }
       
       
@@ -123,7 +123,7 @@ class Player {
     this.executingDash = true;
   }
   dashDeactivate() {
-    this.vel = createVector(0, 0);
+    this.vel.setMag(this.HORIZONTAL_SPEED);
     this.executingDash = false;
     this.dashContext.deactivateCallback();
   }
