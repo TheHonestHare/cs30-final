@@ -24,6 +24,39 @@ const material = (() => {
         tint(255, 255);
       }
     },
+    // a tileset is a predefined
+    Tileset: class {
+      // converts 8*up+4*left+2*right+1*down (up,left,right,down are booleans of if the material there DOESN'T match) to its position in a tileset image
+      static TILE_SET_INDICES = [[1, 1], [1, 2], [2, 1], [2, 2], [0, 1], [0, 2], [3, 1], [3, 2], [1, 0], [1, 3], [2, 0], [2, 3], [0, 0], [0, 3], [3, 0], [3, 3]];
+      // helper function to get the up material, left material, right material, and down material
+      static getMaterialDirections(blockArray, blockArrayW, blockArrayH, index) {
+        const x = index % blockArrayW;
+        const y = Math.floor(index / blockArrayW);
+        return [
+          y === 0 ? null : blockArray[index-blockArrayW],              // up
+          x === 0 ? null : blockArray[index-1],                        // left
+          x+1 === blockArrayW ? null : blockArray[index+1],            // right
+          y+1 === blockArrayH ? null : blockArray[index+blockArrayW],  // down
+        ];
+      }
+      constructor(file_name) {
+        this.image = loadImage("assets/" + file_name);
+      }
+      draw_to_dest(dest, x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=255) {
+        tint(255, opacity);
+        // see TILE_SET_INDICES comment
+        const [tilesetX, tilesetY] = material.Tileset.TILE_SET_INDICES[(up_mat!==mat_num)*8 + (left_mat!==mat_num)*4 + (right_mat!==mat_num)*2 + (down_mat!==mat_num)];
+        dest.image(this.image, x, y, width, height, tilesetX * 8, tilesetY * 8, 8, 8);
+        tint(255, 255);
+      }
+      draw(x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=255) {
+        tint(255, opacity);
+        // see TILE_SET_INDICES comment
+        const [tilesetX, tilesetY] = material.Tileset.TILE_SET_INDICES[(up_mat!==mat_num)*8 + (left_mat!==mat_num)*4 + (right_mat!==mat_num)*2 + (down_mat!==mat_num)];
+        image(this.image, x, y, width, height, tilesetX * 8, tilesetY * 8, 8, 8);
+        tint(255, 255);
+      }
+    }
     
   };
 })();

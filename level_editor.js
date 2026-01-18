@@ -20,7 +20,11 @@ const level_editor = {
       const block_sprite = blockSprites.get(level.block_names[this.selected_block]);
       for(let x = 0; x < selection_width; x++) {
         for(let y = 0; y < selection_height; y++) {
-          block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, 128);
+          if(block_sprite instanceof material.Sprite) {
+            block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, 128);
+          } else {
+            block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, this.selected_block, this.selected_block, this.selected_block, this.selected_block, this.selected_block, 128);
+          }
         }
       }
     }

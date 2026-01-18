@@ -28,6 +28,8 @@ let pixelatedBuffer;
 let blockSpriteSheet;
 let blockSprites = new Map();
 
+let defaultBlockTileSet;
+
 let miscSpriteSheet;
 let playerSprite;
 
@@ -36,6 +38,7 @@ function preload() {
   blockSprites.set("wood", new material.Sprite(blockSpriteSheet, 0, 0, 8, 8));
   blockSprites.set("left_grip", new material.Sprite(blockSpriteSheet, 8, 0, 8, 8));
   blockSprites.set("right_grip", new material.Sprite(blockSpriteSheet, 16, 0, 8, 8));
+  blockSprites.set("default_tile", new material.Tileset("test_tileset.png"));
 
 
   miscSpriteSheet = new material.SpriteSheet("misc.png");

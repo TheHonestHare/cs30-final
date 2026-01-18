@@ -205,7 +205,6 @@ class Player {
     if(context.storedSpeed !== null) {
       if(context.climbObject.isHorizontal()) {
         this.vel.x = context.storedSpeed;
-        console.log(this.vel.x) 
       } else {
         this.vel.y = context.storedSpeed;
       }
@@ -224,7 +223,6 @@ class Player {
     if(context.flingGraceTime <= 0) {
       context.flingGraceTime = 0;
       context.storedSpeed = null;
-      console.log("reset")
     }
     if(!this.keys.activate) {
       this.climbDeactivate();

@@ -12,7 +12,8 @@ const level0 = {
     "air",
     "wood",
     "left_grip",
-    "right_grip"
+    "right_grip",
+    "default_tile",
   ],
   w: 100,
   h: 100,

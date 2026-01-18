@@ -29,9 +29,15 @@ class Level {
     img.noSmooth();
     for(let i = 0; i < this.w; i++) {
       for(let j = 0; j < this.h; j++) {
-        const block_mat = this.block_names[this.block_array[j * this.w + i]];
+        const block_mat_index = this.block_array[j * this.w + i];
+        const block_mat = this.block_names[block_mat_index];
         if(block_mat === "air") continue;   
-        blockSprites.get(block_mat).draw_to_dest(img, i * 8, j * 8, 8, 8);
+        const mat = blockSprites.get(block_mat);
+        if(mat instanceof material.Sprite) {
+          mat.draw_to_dest(img, i * 8, j * 8, 8, 8);
+        } else {
+          mat.draw_to_dest(img, i * 8, j * 8, 8, 8, block_mat_index, ...material.Tileset.getMaterialDirections(this.block_array, this.w, this.h, j * this.w + i));
+        }
       }
     }
     this.img = img;
