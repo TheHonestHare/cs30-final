@@ -14,6 +14,10 @@ const level0 = {
     "left_grip",
     "right_grip",
     "default_tile",
+    "up_spike",
+    "left_spike",
+    "down_spike",
+    "right_spike"
   ],
   w: 100,
   h: 100,

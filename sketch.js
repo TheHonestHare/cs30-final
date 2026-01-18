@@ -38,6 +38,10 @@ function preload() {
   blockSprites.set("wood", new material.Sprite(blockSpriteSheet, 0, 0, 8, 8));
   blockSprites.set("left_grip", new material.Sprite(blockSpriteSheet, 8, 0, 8, 8));
   blockSprites.set("right_grip", new material.Sprite(blockSpriteSheet, 16, 0, 8, 8));
+  blockSprites.set("up_spike", new material.Sprite(blockSpriteSheet, 24, 0, 8, 8));
+  blockSprites.set("left_spike", new material.Sprite(blockSpriteSheet, 32, 0, 8, 8));
+  blockSprites.set("down_spike", new material.Sprite(blockSpriteSheet, 40, 0, 8, 8));
+  blockSprites.set("right_spike", new material.Sprite(blockSpriteSheet, 48, 0, 8, 8));
   blockSprites.set("default_tile", new material.Tileset("test_tileset.png"));
 
 

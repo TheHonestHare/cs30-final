@@ -56,7 +56,38 @@ const material = (() => {
         image(this.image, x, y, width, height, tilesetX * 8, tilesetY * 8, 8, 8);
         tint(255, 255);
       }
+    },
+    blockProperties: class {
+      constructor(solid, hurt_aabb, visible) {
+        this.solid = solid;
+        this.hurt_aabb = hurt_aabb;
+        this.visible = visible;
+      }
+    },
+    getBlockProperties(name) {
+      switch(name) {
+        case "air": {
+          return new material.blockProperties(false, null, false);
+        }
+        case "left_spike": {
+          return new material.blockProperties(false, new physics.AABB(createVector(0, 0), createVector(2/8, 8/8)), true);
+        }
+        case "up_spike": {
+          return new material.blockProperties(false, new physics.AABB(createVector(0, 6/8), createVector(8/8, 2/8)), true);
+        }
+        case "down_spike": {
+          return new material.blockProperties(false, new physics.AABB(createVector(0, 0/8), createVector(8/8, 2/8)), true);
+        }
+        case "right_spike": {
+          return new material.blockProperties(false, new physics.AABB(createVector(6/8, 0), createVector(2/8, 8/8)), true);
+        }
+        default: {
+          return new material.blockProperties(true, null, true);
+        }
+      }
     }
+
+    
     
   };
 })();

@@ -189,7 +189,7 @@ const physics = (() => {
       if(!between(y, -1, level.h)) return false;
       for(let x = Math.floor(thing.aabb.origin.x); x < Math.ceil(thing.aabb.origin.x + thing.aabb.dims.x); x++) {
         if(!between(x, -1, level.w)) continue;
-        if(level.block_array[y * level.w + x]) return true;
+        if(level.getBlockProperties(x, y).solid) return true;
       }
       return false;
     },
@@ -206,7 +206,7 @@ const physics = (() => {
       if(!between(x, -1, level.w)) return false;
       for(let y = Math.floor(thing.aabb.origin.y); y < Math.ceil(thing.aabb.origin.y + thing.aabb.dims.y); y++) {
         if(!between(y, -1, level.h)) continue;
-        if(level.block_array[y * level.w + x]) return true;
+        if(level.getBlockProperties(x, y).solid) return true;
       }
       return false;
     },
@@ -223,7 +223,7 @@ const physics = (() => {
       if(!between(x, -1, level.w)) return false;
       for(let y = Math.floor(thing.aabb.origin.y); y < Math.ceil(thing.aabb.origin.y + thing.aabb.dims.y); y++) {
         if(!between(y, -1, level.h)) continue;
-        if(level.block_array[y * level.w + x]) return true;
+        if(level.getBlockProperties(x, y).solid) return true;
       }
       return false;
     },
@@ -240,26 +240,50 @@ const physics = (() => {
       if(!between(y, -1, level.h)) return false;
       for(let x = Math.floor(thing.aabb.origin.x); x < Math.ceil(thing.aabb.origin.x + thing.aabb.dims.x); x++) {
         if(!between(x, -1, level.w)) continue;
-        if(level.block_array[y * level.w + x]) return true;
+        if(level.getBlockProperties(x, y).solid) return true;
       }
       return false;
     },
-    do_collisions(thing, deltaT) {
+    // on damage should return bool stating if the collision detection should return after taking damage
+    do_collisions(thing, deltaT, onDamage) {
       // precondition
       if(thing.aabb === undefined || thing.vel === undefined) return;
 
       // x
       let res;
+      let deathTime;
       const x_delta = createVector(thing.vel.x * deltaT, 0);
       const spanned_x = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, x_delta);
       for(let coord of spanned_x) {
         if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) continue;
-        if(!level.block_array[coord.y * level.w + coord.x]) continue;
-        const box = new physics.AABB(coord, createVector(1, 1));
-        const temp_res = box.sweepAABB(thing.aabb, x_delta);   
-        if(temp_res === null) continue;
-        if(res === undefined || temp_res.time < res.time) res = temp_res;
+        const block_props = level.getBlockProperties(coord.x, coord.y);
+        if(!block_props.solid && block_props.hurt_aabb === null) continue;
+        if(block_props.hurt_aabb !== null) {
+          // dealing with something that can hurt the player
+          const box = new physics.AABB(coord.add(block_props.hurt_aabb.origin), block_props.hurt_aabb.dims);
+          const temp_res = box.sweepAABB(thing.aabb, x_delta);
+          if(temp_res === null) continue;
+          if(res === undefined || temp_res.time < res.time) {
+            // TODO: this shouldn't set res
+            res = temp_res;
+            deathTime = res.time;
+          }
+        } else {
+          const box = new physics.AABB(coord, createVector(1, 1));
+          const temp_res = box.sweepAABB(thing.aabb, x_delta);   
+          if(temp_res === null) continue;
+          if(res === undefined || temp_res.time < res.time) {
+            res = temp_res;
+            deathTime = undefined;
+          }
+        }
+
+        
       };
+      // thing took damage
+      if(deathTime !== undefined) {
+        if(onDamage()) return;
+      }
       // didn't collide with any blocks
       if(res === undefined) {
         thing.aabb.origin.x += thing.vel.x * deltaT;
@@ -271,16 +295,39 @@ const physics = (() => {
 
       // y
       res = undefined;
+      deathTime = undefined;
       const y_delta = createVector(0, thing.vel.y * deltaT);
       const spanned_y = physics.findAllGridSquaresSpanned(thing.aabb.origin, thing.aabb.dims, y_delta);
       for(let coord of spanned_y) {
         if(!between(coord.x, -1, level.w) || !between(coord.y, -1, level.h)) continue;
-        if(!level.block_array[coord.y * level.w + coord.x]) continue;
-        const box = new physics.AABB(coord, createVector(1, 1));
-        const temp_res = box.sweepAABB(thing.aabb, y_delta);   
-        if(temp_res === null) continue;
-        if(res === undefined || temp_res.time < res.time) res = temp_res;
+
+        const block_props = level.getBlockProperties(coord.x, coord.y);
+        if(!block_props.solid && block_props.hurt_aabb === null) continue;
+        if(block_props.hurt_aabb !== null) {
+          // dealing with something that can hurt the player
+          const box = new physics.AABB(coord.add(block_props.hurt_aabb.origin), block_props.hurt_aabb.dims);
+          const temp_res = box.sweepAABB(thing.aabb, y_delta);
+          if(temp_res === null) continue;
+          if(res === undefined || temp_res.time < res.time) {
+            res = temp_res;
+            deathTime = res.time;
+          }
+        } else {
+          const box = new physics.AABB(coord, createVector(1, 1));
+          const temp_res = box.sweepAABB(thing.aabb, y_delta);   
+          if(temp_res === null) continue;
+          if(res === undefined || temp_res.time < res.time) {
+            res = temp_res;
+            deathTime = undefined;
+          }
+        }
       };
+
+      // thing took damage
+      if(deathTime !== undefined) {
+        if(onDamage()) return;
+      }
+
       // didn't collide with any blocks
       if(res === undefined) {
         thing.aabb.origin.y += thing.vel.y * deltaT;
