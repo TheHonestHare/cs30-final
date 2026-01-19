@@ -42,19 +42,21 @@ const material = (() => {
       constructor(file_name) {
         this.image = loadImage("assets/" + file_name);
       }
-      draw_to_dest(dest, x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=255) {
-        tint(255, opacity);
+      draw_to_dest(dest, x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=null) {
+        dest.push();
+        if(opacity !== null) dest.tint(255, opacity);
         // see TILE_SET_INDICES comment
         const [tilesetX, tilesetY] = material.Tileset.TILE_SET_INDICES[(up_mat!==mat_num)*8 + (left_mat!==mat_num)*4 + (right_mat!==mat_num)*2 + (down_mat!==mat_num)];
         dest.image(this.image, x, y, width, height, tilesetX * 8, tilesetY * 8, 8, 8);
-        tint(255, 255);
+        dest.pop();
       }
-      draw(x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=255) {
-        tint(255, opacity);
+      draw(x, y, width, height, mat_num, up_mat, left_mat, right_mat, down_mat, opacity=null) {
+        push();
+        if(opacity !== null) tint(255, opacity);
         // see TILE_SET_INDICES comment
         const [tilesetX, tilesetY] = material.Tileset.TILE_SET_INDICES[(up_mat!==mat_num)*8 + (left_mat!==mat_num)*4 + (right_mat!==mat_num)*2 + (down_mat!==mat_num)];
         image(this.image, x, y, width, height, tilesetX * 8, tilesetY * 8, 8, 8);
-        tint(255, 255);
+        pop();
       }
     },
     blockProperties: class {

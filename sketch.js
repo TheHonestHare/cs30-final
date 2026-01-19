@@ -31,7 +31,6 @@ let blockSprites = new Map();
 let defaultBlockTileSet;
 
 let miscSpriteSheet;
-let playerSprite;
 
 function preload() {
   preloadLevelList();
@@ -51,8 +50,7 @@ function preload() {
 
 
   miscSpriteSheet = new material.SpriteSheet("misc.png");
-  playerSprite = new material.Sprite(miscSpriteSheet, 0, 0, 8, 8);
-
+  Player.preload();
   SceneItems.preload();
 
   abilities.preload();
@@ -60,7 +58,7 @@ function preload() {
 function setup() {
   setAttributes("antialias", false);
   createCanvas(floor(windowWidth/cam.zoom)*cam.zoom, floor(windowHeight/cam.zoom)*cam.zoom, WEBGL);
-  player = new Player(4, -4, playerSprite);
+  player = new Player(4, -4);
   level_manager.load();
   pixelatedBuffer = createFramebuffer({
     antialias: false,

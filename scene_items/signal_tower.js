@@ -41,6 +41,6 @@ class SignalTower {
       x: this.aabb.origin.x,
       y: this.aabb.origin.y-3,
       energy_level: this.energy_level,
-    }
+    };
   }
 }
