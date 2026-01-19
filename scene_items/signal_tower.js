@@ -13,6 +13,7 @@ class SignalTower {
     abilities.placer.can_enter = this.aabb.is_overlapping_aabb(player.aabb);
     if(abilities.placer.can_enter) {
       abilities.power_level = this.energy_level;
+      abilities.index = null;
     }
   }
   draw() {
