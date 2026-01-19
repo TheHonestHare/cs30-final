@@ -1,7 +1,8 @@
 const level_editor = {
   active: false,
   current_selection_start: undefined,
-  selected_block: 1,
+  placing: "blocks",
+  selected_index: 1,
   render_selection() {
     if(!this.active) return;
     const mouse_grid_pos = (() => {
@@ -16,14 +17,14 @@ const level_editor = {
     const selection_height = Math.max(1, mouse_grid_pos.y - select_start.y + 1); 
 
     // display the centre blocks if the left mouse
-    if(!mouseIsPressed || mouseButton === LEFT) {
-      const block_sprite = blockSprites.get(level.block_names[this.selected_block]);
+    if((!mouseIsPressed || mouseButton === LEFT) && this.placing === "blocks") {
+      const block_sprite = blockSprites.get(level.block_names[this.selected_index]);
       for(let x = 0; x < selection_width; x++) {
         for(let y = 0; y < selection_height; y++) {
           if(block_sprite instanceof material.Sprite) {
             block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, 128);
           } else {
-            block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, this.selected_block, this.selected_block, this.selected_block, this.selected_block, this.selected_block, 128);
+            block_sprite.draw(select_start.x + x, select_start.y + y, 1, 1, this.selected_index, this.selected_index, this.selected_index, this.selected_index, this.selected_index, 128);
           }
         }
       }
@@ -48,9 +49,14 @@ const level_editor = {
       [x, y] = mouse.get_mouse_grid_pos();
       return createVector(x, y);
     })();
-    const block_index = is_left ? this.selected_block : 0;
-    this.fill_selection_with_block(this.current_selection_start, mouse_grid_pos, block_index);
+    if(this.placing === "blocks") {
+      const block_index = is_left ? this.selected_index : 0;
+      this.fill_selection_with_block(this.current_selection_start, mouse_grid_pos, block_index); 
+    } else if(this.placing === "scene_items") {
+      level.scene_items.push(SceneItems.getNthItem(this.selected_index).createDefaultObj(x, y));
+    }
     this.current_selection_start = undefined;
+    
   },
   fill_selection_with_block(topleft, botright, material_index) {
     if(!between(topleft.x, -1, level.w) || !between(topleft.y, -1, level.h)) return;

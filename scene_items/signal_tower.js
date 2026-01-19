@@ -14,6 +14,9 @@ class SignalTower {
     if(abilities.placer.can_enter) {
       abilities.power_level = this.energy_level;
       abilities.index = null;
+      level.scene_items.forEach((obj) => {
+        obj.reset();
+      });
     }
   }
   draw() {
@@ -22,5 +25,13 @@ class SignalTower {
     } else {
       SignalTower.off_sprite.draw(this.aabb.origin.x, this.aabb.origin.y, 2, 4);
     }
+  }
+  reset() {}
+  static createDefaultObj(x, y) {
+    return new SignalTower({
+      x: x,
+      y: y,
+      energy_level: 3,
+    });
   }
 }

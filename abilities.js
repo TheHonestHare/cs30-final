@@ -1,5 +1,6 @@
 const abilities = (() => {
   return {
+    list: undefined,
     placed_array: [],
     power_level: 0,
     index: null,
@@ -62,8 +63,10 @@ const abilities = (() => {
     },
 
     preload() {
-      this.Dash.preload();
-      this.Climb.preload();
+      this.list = [this.Dash, this.Climb];
+      this.list.forEach((obj) => {
+        obj.preload();
+      });
       this.placer.selected_ability = this.Climb;
     },
 

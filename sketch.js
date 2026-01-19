@@ -106,6 +106,10 @@ function keyPressed() {
   if(key === 'u') {
     if(abilities.placer.active) {
       abilities.placed_array.pop();
+    } else if(level_editor.active && level_editor.placing === "scene_items") {
+      level.scene_items.pop();
+    } else {
+      player.respawn();
     }
   }
   if(key === 'l') {
@@ -129,15 +133,28 @@ function keyPressed() {
       abilities.activate();
     }
   }
-  if(keyCode === RIGHT_ARROW && level_editor.active) {
-    if(level_editor.selected_block < level.block_names.length - 1) {
-      level_editor.selected_block += 1;
+  if(keyCode === RIGHT_ARROW) {
+    if(abilities.placer.active) {
+      abilities.placer.selected_ability = abilities.Climb;
+    } else if(level_editor.active) {
+      level_editor.selected_index = Math.min(level_editor.selected_index + 1, level_editor.placing === "blocks" ? level.block_names.length : SceneItems.nameMap.size);
+    }
+    
+  }
+  if(keyCode === LEFT_ARROW) {
+    if(abilities.placer.active) {
+      abilities.placer.selected_ability = abilities.Dash;
+    } else if(level_editor.active) {
+      level_editor.selected_index = Math.max(level_editor.selected_index - 1, level_editor.placing === "blocks" ? 1 : 0);
     }
   }
-  if(keyCode === LEFT_ARROW && level_editor.active) {
-    if(level_editor.selected_block > 1) {
-      level_editor.selected_block -= 1;
-    }
+  if(keyCode === UP_ARROW && level_editor.active) {
+    level_editor.placing = "scene_items";
+    level_editor.selected_index = 0;
+  }
+  if(keyCode === DOWN_ARROW && level_editor.active) {
+    level_editor.placing = "blocks";
+    level_editor.selected_index = 1;
   }
 }
 function mousePressed() {
