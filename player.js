@@ -333,7 +333,11 @@ class Player {
 
   respawn() {
     this.vel = createVector(0, 0);
-    this.aabb.origin = level.scene_items[0].aabb.origin.copy();
+    if(level.scene_items[0] instanceof SignalTower) {
+      this.aabb.origin = level.scene_items[0].aabb.origin.copy();
+    } else {
+      this.aabb.origin = level.spawnPos.copy();
+    }
     cam.calculateCameraStartPos(null, level.w, level.h);
   }
   

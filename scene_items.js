@@ -3,6 +3,7 @@ const SceneItems = {
     const res = new Map();
     res.set("SignalTower", SignalTower);
     res.set("EnergyBottle", EnergyBottle);
+    res.set("LevelExitTrigger", LevelExitTrigger);
     return res;
   })(),
 

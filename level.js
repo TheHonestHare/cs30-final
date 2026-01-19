@@ -71,6 +71,8 @@ const level_manager = {
     level = this.getNthLevel(this.level);
     player.aabb.origin.x = level.spawnPos.x;
     player.aabb.origin.y = level.spawnPos.y;
+    abilities.placed_array = [];
+    cam.calculateCameraStartPos();
 
     // tutorial
     if(this.level === 1) {

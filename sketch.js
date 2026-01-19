@@ -155,8 +155,8 @@ function keyPressed() {
     level_editor.placing = "blocks";
     level_editor.selected_index = 1;
   }
-  if(key === "1") {
-    level_manager.level = 1;
+  if(key - "0" >= 0 && key - "0" < 9) {
+    level_manager.level = key - "0";
     level_manager.load();
   }
 }
