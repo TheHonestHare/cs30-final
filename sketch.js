@@ -6,19 +6,17 @@ Grid based game
 This is a platformer where you need to place down abilities in order to use them
 
 Controls:
-L: toggle level editor. Use left click to place wood and right click to place air
-K: when at the signal tower, deletes the ability sequence
-   when not at the signal tower, resets the ability sequence
-J: activates the next ability in the sequence. There is currently only one ability: dash
+L: toggle level editor. Use arrows to change the selection, left click to place, right click to delete
+U: when at the signal tower, undo the last ability placed
+   when in the level editor, undo the last scene object placed (eg bottles, signal towers)
+   when not at the signal tower, respawns the player
+J: If by the signal tower, enter/exit the signal tower. Otherwise, activates the next ability in the sequence. There is currently 2 abilities
+  DASH:
    J + WASD will cause the player to dash in the respective direction if they are touching a dash orb
-   Pressing J multiple times will move through the ability sequence.
-Left click (at signal tower) places a dash orb. The order in which the dash orbs are placed forms the ability sequence
-
-2d grid:
-Technically I didn't use a 2d grid but I think it still counts bc I used a 1d grid and indexed it with the formula [x * cols + y]
-  Check level_editor.js, level.js for example usage
-Extra for experts:
-  I explored static variables as seen in abilities.js for example
+  CLIMB:
+    holding J will allow you to move along the climb at incredible speeds. Releasing J or pressing the button that is opposite of the wall/floor will send the player flying
+  Pressing J multiple times will move through the ability sequence.
+Dragging/clicking left click (at signal tower) places either a climb (ONLY NEXT TO WALL) or a dash. The order in which the dash orbs are placed forms the ability sequence
 */
 
 let level;
