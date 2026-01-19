@@ -17,7 +17,11 @@ const level0 = {
     "up_spike",
     "left_spike",
     "down_spike",
-    "right_spike"
+    "right_spike",
+    "metal_tile",
+    "oxidized_tile",
+    "metal_pole",
+    "cobble_tile",
   ],
   w: 100,
   h: 100,

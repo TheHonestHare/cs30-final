@@ -43,6 +43,10 @@ function preload() {
   blockSprites.set("down_spike", new material.Sprite(blockSpriteSheet, 40, 0, 8, 8));
   blockSprites.set("right_spike", new material.Sprite(blockSpriteSheet, 48, 0, 8, 8));
   blockSprites.set("default_tile", new material.Tileset("test_tileset.png"));
+  blockSprites.set("metal_tile", new material.Tileset("metal_tileset.png"));
+  blockSprites.set("oxidized_tile", new material.Tileset("oxidized_tileset.png"));
+  blockSprites.set("metal_pole", new material.Tileset("metal_pole_tileset.png"));
+  blockSprites.set("cobble_tile", new material.Tileset("cobble_tileset.png"));
 
 
   miscSpriteSheet = new material.SpriteSheet("misc.png");
