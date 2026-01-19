@@ -168,7 +168,7 @@ const abilities = (() => {
         };
       }
       deactivate() {
-        Dash.deactivate(this)();
+        abilities.Dash.deactivate(this)();
       }
       physics_tick(deltaT) {
         return !this.done;
