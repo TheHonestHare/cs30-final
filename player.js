@@ -122,7 +122,10 @@ class Player {
     }
     
     
-    physics.do_collisions(this, deltaT, () => {this.respawn(); return true;});
+    physics.do_collisions(this, deltaT, () => {
+      this.respawn();
+      return true;
+    });
     if(this.aabb.origin.y > level.h + 5) this.respawn();
   }
 
@@ -161,13 +164,19 @@ class Player {
     }
     const completion_delta_t = ability_duration >= abilities.Dash.total_dash_length ? -(ability_duration - abilities.Dash.total_dash_length - deltaT) : deltaT;
 
-    physics.do_collisions(this, completion_delta_t, () => {this.respawn(); return true;});
+    physics.do_collisions(this, completion_delta_t, () => {
+      this.respawn();
+      return true;
+    });
 
     // end ability
     if(ability_duration >= abilities.Dash.total_dash_length) {
       const remaining_delta_t = deltaT - completion_delta_t;
       this.dashDeactivate();
-      physics.do_collisions(this, remaining_delta_t, () => {this.respawn(); return true;});
+      physics.do_collisions(this, remaining_delta_t, () => {
+        this.respawn();
+        return true;
+      });
     }
   }
 
@@ -281,7 +290,10 @@ class Player {
     }
     
     // do physics move
-    physics.do_collisions(this, deltaT, () => {this.respawn(); return true;});
+    physics.do_collisions(this, deltaT, () => {
+      this.respawn();
+      return true;
+    });
 
     // stop the player from leaving ability
     if(context.climbObject.isHorizontal()) {
