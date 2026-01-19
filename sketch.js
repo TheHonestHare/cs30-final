@@ -34,6 +34,7 @@ let miscSpriteSheet;
 let playerSprite;
 
 function preload() {
+  preloadLevelList();
   blockSpriteSheet = new material.SpriteSheet("blocks.png");
   blockSprites.set("wood", new material.Sprite(blockSpriteSheet, 0, 0, 8, 8));
   blockSprites.set("left_grip", new material.Sprite(blockSpriteSheet, 8, 0, 8, 8));
@@ -60,7 +61,7 @@ function setup() {
   setAttributes("antialias", false);
   createCanvas(floor(windowWidth/cam.zoom)*cam.zoom, floor(windowHeight/cam.zoom)*cam.zoom, WEBGL);
   player = new Player(4, -4, playerSprite);
-  level = level_manager.load(0);
+  level_manager.load();
   pixelatedBuffer = createFramebuffer({
     antialias: false,
     textureFiltering: NEAREST,
@@ -106,8 +107,8 @@ function keyPressed() {
   if(key === 'u') {
     if(abilities.placer.active) {
       abilities.placed_array.pop();
-    } else if(level_editor.active && level_editor.placing === "scene_items") {
-      level.scene_items.pop();
+    } else if(level_editor.active) {
+      if(level_editor.placing === "scene_items") level.scene_items.pop();
     } else {
       player.respawn();
     }
@@ -137,7 +138,7 @@ function keyPressed() {
     if(abilities.placer.active) {
       abilities.placer.selected_ability = abilities.Climb;
     } else if(level_editor.active) {
-      level_editor.selected_index = Math.min(level_editor.selected_index + 1, level_editor.placing === "blocks" ? level.block_names.length : SceneItems.nameMap.size);
+      level_editor.selected_index = Math.min(level_editor.selected_index + 1, level_editor.placing === "blocks" ? level.block_names.length-1 : SceneItems.nameMap.size-1);
     }
     
   }
@@ -155,6 +156,10 @@ function keyPressed() {
   if(keyCode === DOWN_ARROW && level_editor.active) {
     level_editor.placing = "blocks";
     level_editor.selected_index = 1;
+  }
+  if(key === "1") {
+    level_manager.level = 1;
+    level_manager.load();
   }
 }
 function mousePressed() {

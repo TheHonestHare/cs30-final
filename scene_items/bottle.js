@@ -35,6 +35,15 @@ class EnergyBottle {
     this.collected = false;
   }
 
+  toJSON() {
+    return {
+      type: "EnergyBottle",
+      x: this.gridx,
+      y: this.gridy,
+      count: this.count,
+    };
+  }
+
   static createDefaultObj(x, y) {
     return new EnergyBottle({
       x: x,

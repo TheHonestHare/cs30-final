@@ -30,8 +30,17 @@ class SignalTower {
   static createDefaultObj(x, y) {
     return new SignalTower({
       x: x,
-      y: y,
+      y: y-6,
       energy_level: 3,
     });
+  }
+
+  toJSON() {
+    return {
+      type: "SignalTower",
+      x: this.aabb.origin.x,
+      y: this.aabb.origin.y-3,
+      energy_level: this.energy_level,
+    }
   }
 }

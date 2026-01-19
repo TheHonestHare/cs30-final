@@ -52,14 +52,47 @@ class Level {
   getBlockProperties(x, y) {
     return material.getBlockProperties(this.block_names[this.block_array[y * this.w + x]]);
   }
+
+  toJSON() {
+    return {
+      block_array: this.block_array,
+      block_names: this.block_names,
+      w: this.w,
+      h: this.h,
+      spawnx: this.spawnPos.x,
+      spawny: this.spawnPos.y,
+      scene_items: this.scene_items,
+    };
+  }
 }
 const level_manager = {
   "level": 0,
-  "load": (n) => {
+  load() {
+    level = this.getNthLevel(this.level);
+    player.aabb.origin.x = level.spawnPos.x;
+    player.aabb.origin.y = level.spawnPos.y;
+
+    // tutorial
+    if(this.level === 1) {
+      abilities.placed_array.push(abilities.Dash.try_to_place(createVector(18, 15)));
+      abilities.placed_array.push(abilities.Dash.try_to_place(createVector(24, 13)));
+      abilities.placed_array.push(abilities.Dash.try_to_place(createVector(24, 6)));
+    }
+  },
+  getNthLevel(n) {
+    console.log(`fetching level ${n}`);
     switch(n) {
-      case 0: 
+      case 0:
         return Level.fromObject(level0);
+      default: {
+        return Level.fromObject(levelList[n-1]);
+      }
     }
   }
 };
 
+let levelList = [];
+
+function preloadLevelList() {
+  levelList.push(loadJSON('./levels/level1.json'));
+}

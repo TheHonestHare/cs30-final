@@ -20,9 +20,8 @@ const SceneItems = {
   // static createDefaultObj(x, y)
   processEntry(entry) {
     if(entry.type === undefined) return null;
-    if(entry.data === undefined) return null;
     if(!SceneItems.nameMap.has(entry.type)) return null;
-    return new (SceneItems.nameMap.get(entry.type))(entry.data);
+    return new (SceneItems.nameMap.get(entry.type))(entry);
   },
   getNthItem(n) {
     return Array.from(this.nameMap.values())[n];
