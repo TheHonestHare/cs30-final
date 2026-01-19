@@ -14,6 +14,7 @@ const abilities = (() => {
     },
     placer: {
       active: false,
+      can_enter: true,
       selected_ability: undefined,
 
       highlight_grid_pos() {
@@ -47,10 +48,14 @@ const abilities = (() => {
       },
       exit() {
         this.active = false;
+        player.ignoreInput = false;
+        cam.followMode = cam.modes.free;
         abilities.index = null;
       },
       enter() {
         this.active = true;
+        player.ignoreInput = true;
+        cam.followMode = cam.modes.fly;
         abilities.index = null;
         abilities.current_ability_still_running = false;
       }

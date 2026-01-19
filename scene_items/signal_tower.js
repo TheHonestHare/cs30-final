@@ -8,18 +8,15 @@ class SignalTower {
   constructor(data) {
     this.aabb = new physics.AABB(createVector(data.x, data.y+3), createVector(2, 4));
     this.energy_level = data.energy_level;
-    this.intersecting_player = false;
   }
   tick() {
-    const now_intersecting_player = this.aabb.is_overlapping_aabb(player.aabb);
-    if(this.intersecting_player !== now_intersecting_player) {
-      now_intersecting_player ? abilities.placer.enter() : abilities.placer.exit();
-      this.intersecting_player = now_intersecting_player;
+    abilities.placer.can_enter = this.aabb.is_overlapping_aabb(player.aabb);
+    if(abilities.placer.can_enter) {
       abilities.power_level = this.energy_level;
     }
   }
   draw() {
-    if(this.intersecting_player) {
+    if(abilities.placer.can_enter) {
       SignalTower.on_sprite.draw(this.aabb.origin.x, this.aabb.origin.y, 2, 4);
     } else {
       SignalTower.off_sprite.draw(this.aabb.origin.x, this.aabb.origin.y, 2, 4);

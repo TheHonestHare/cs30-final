@@ -103,11 +103,9 @@ function draw() {
 }
 
 function keyPressed() {
-  if(key === 'k') {
+  if(key === 'u') {
     if(abilities.placer.active) {
-      abilities.placed_array = [];
-    } else {
-      abilities.index = null;
+      abilities.placed_array.pop();
     }
   }
   if(key === 'l') {
@@ -120,7 +118,17 @@ function keyPressed() {
       player.ignoreInput = false;
     }
   }
-  if(key === 'j') abilities.activate();
+  if(key === 'j') {
+    if(abilities.placer.can_enter) {
+      if(abilities.placer.active) {
+        abilities.placer.exit();
+      } else {
+        abilities.placer.enter();
+      }
+    } else {
+      abilities.activate();
+    }
+  }
   if(keyCode === RIGHT_ARROW && level_editor.active) {
     if(level_editor.selected_block < level.block_names.length - 1) {
       level_editor.selected_block += 1;

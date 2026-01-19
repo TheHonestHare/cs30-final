@@ -103,9 +103,9 @@ class Player {
       } else {
         // decelerating player to desired vel
         this.vel.x = approach(this.vel.x, this.HORIZONTAL_SPEED * x_dir, this.GROUND_DECEL * (this.onGround ? 1 : this.AIR_DEFRICTION_FRACTOR) * deltaT);
-      }
-      
-      
+      } 
+    } else {
+      this.vel = createVector(0,0);
     }
     
     

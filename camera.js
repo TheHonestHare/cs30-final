@@ -51,8 +51,8 @@ const cam = {
   },
   update(deltaT) {
     if(this.followMode === this.modes.fly) {
-      this.target.x += 10 * deltaT * (player.keys.right - player.keys.left);
-      this.target.y -= 10 * deltaT * (player.keys.up - player.keys.down);
+      this.target.x += 20 * deltaT * (player.keys.right - player.keys.left);
+      this.target.y -= 20 * deltaT * (player.keys.up - player.keys.down);
     }
     let optimalTarget = player.aabb.get_centre().add(10, 0);
     this.target.x = [this.modes.fly, this.modes.none, this.modes.y_only].indexOf(this.followMode) !== -1 ? this.target.x : optimalTarget.x;
@@ -64,16 +64,24 @@ const cam = {
     const maxSpeedX = 40;
     const maxSpeedY = 80;
 
+    if(this.followMode === this.modes.fly) {
+      this.aabb.origin.x = approach(this.aabb.origin.x, this.aabb.dims.x/2-this.target.x, maxSpeedX);
+      this.aabb.origin.y = approach(this.aabb.origin.y, this.aabb.dims.y/2-this.target.y, maxSpeedX);
+      return;
+    }
+
+
     let delta = p5.Vector.sub(this.aabb.dims, this.target).sub(this.aabb.get_centre());
     if(Math.abs(delta.x) < 0.0001) {
       this.vel.x = 0; 
     } else {
-      this.vel.x = (delta.x > 0 ? 1 : -1) * Math.min(maxSpeedX, Math.abs(delta.x) * 2.5 * (this.followMode === this.modes.fly ? 10 : 1));
+      this.vel.x = (delta.x > 0 ? 1 : -1) * Math.min(maxSpeedX, Math.abs(delta.x) * 2.5);
     }
+
     if(Math.abs(delta.y) < 0.0001) {
       this.vel.y = 0;
     } else {
-      this.vel.y = (delta.y > 0 ? 1 : -1) * Math.min(maxSpeedY, Math.abs(delta.y) * 2.5 * (this.followMode === this.modes.fly ? 10 : 1.5));
+      this.vel.y = (delta.y > 0 ? 1 : -1) * Math.min(maxSpeedY, Math.abs(delta.y) * 2.5 *  1.5);
     }
     
     this.aabb.origin.add(p5.Vector.mult(this.vel, deltaT));
