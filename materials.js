@@ -18,6 +18,7 @@ const material = (() => {
         dest.image(this.sprite_sheet.image, x, y, width, height, this.sprite_pos_x, this.sprite_pos_y, this.w, this.h);
         dest.tint(255, 255);
       }
+      // TODO: this renders wrong when +0.005 away from 1/8th of a block
       draw(x, y, width, height, opacity=255) {
         tint(255, opacity);
         image(this.sprite_sheet.image, x, y, width, height, this.sprite_pos_x, this.sprite_pos_y, this.w, this.h);

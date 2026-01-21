@@ -64,8 +64,7 @@ class Player {
       this.dashDraw();
       return;
     }
-    const new_origin = pixelAlignVector(this.aabb.origin);
-    this.getSprite().draw(new_origin.x, new_origin.y, this.aabb.dims.x, this.aabb.dims.y);
+    this.getSprite().draw(this.aabb.origin.x, this.aabb.origin.y, this.aabb.dims.x, this.aabb.dims.y);
   }
 
   // code derived from Sebastian Lague https://www.youtube.com/watch?v=PlT44xr0iW0

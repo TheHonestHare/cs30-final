@@ -119,10 +119,10 @@ const physics = (() => {
         const isNegX = scaleX <= 0;
         const isNegY = scaleY <= 0;
 
-        let nearTimeX = delta.x !== 0 ? (this.origin.x + isNegX * this.dims.x - pos.x) * scaleX : 0;
-        let nearTimeY = delta.y !== 0 ? (this.origin.y + isNegY * this.dims.y - pos.y) * scaleY : 0;
-        let farTimeX = delta.x !== 0 ? (this.origin.x + !isNegX * this.dims.x - pos.x) * scaleX : Infinity;
-        let farTimeY = delta.y !== 0 ?(this.origin.y + !isNegY * this.dims.y - pos.y) * scaleY : Infinity;
+        let nearTimeX = (this.origin.x + isNegX * this.dims.x - pos.x) * scaleX;
+        let nearTimeY = (this.origin.y + isNegY * this.dims.y - pos.y) * scaleY;
+        let farTimeX = (this.origin.x + !isNegX * this.dims.x - pos.x) * scaleX;
+        let farTimeY = (this.origin.y + !isNegY * this.dims.y - pos.y) * scaleY;
 
         if(pos.x === this.origin.x && delta.x === 0) return null;
         if(pos.y === this.origin.y && delta.y === 0) return null;
@@ -159,7 +159,7 @@ const physics = (() => {
           return res;
         }
 
-        const res = new_box.intersectSegment(other_box.origin, delta, other_box.dims);
+        const res = new_box.intersectSegment(other_box.origin, delta);
         return res;
       }
     },
@@ -264,10 +264,9 @@ const physics = (() => {
           const temp_res = box.sweepAABB(thing.aabb, x_delta);
           if(temp_res === null) continue;
           if(res === undefined || temp_res.time < res.time) {
-            // TODO: this shouldn't set res
-            res = temp_res;
-            deathTime = res.time;
+            deathTime = temp_res.time;
           }
+          
         } else {
           const box = new physics.AABB(coord, createVector(1, 1));
           const temp_res = box.sweepAABB(thing.aabb, x_delta);   
@@ -277,11 +276,10 @@ const physics = (() => {
             deathTime = undefined;
           }
         }
-
-        
       };
       // thing took damage
-      if(deathTime !== undefined) {
+      if(deathTime !== undefined && (res === undefined || deathTime < res.time)) {
+        console.log(res)
         if(onDamage()) return;
       }
       // didn't collide with any blocks
@@ -309,8 +307,7 @@ const physics = (() => {
           const temp_res = box.sweepAABB(thing.aabb, y_delta);
           if(temp_res === null) continue;
           if(res === undefined || temp_res.time < res.time) {
-            res = temp_res;
-            deathTime = res.time;
+            deathTime = temp_res.time;
           }
         } else {
           const box = new physics.AABB(coord, createVector(1, 1));
@@ -324,7 +321,7 @@ const physics = (() => {
       };
 
       // thing took damage
-      if(deathTime !== undefined) {
+      if(deathTime !== undefined && (res === undefined || deathTime < res.time)) {
         if(onDamage()) return;
       }
 
