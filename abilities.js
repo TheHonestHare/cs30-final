@@ -1,5 +1,6 @@
 const abilities = (() => {
   return {
+    out_of_battery_sound: undefined,
     list: undefined,
     placed_array: [],
     power_level: 0,
@@ -68,6 +69,8 @@ const abilities = (() => {
         obj.preload();
       });
       this.placer.selected_ability = this.Climb;
+
+      this.out_of_battery_sound = loadSound('assets/sounds/out_of_battery.mp3');
     },
 
     draw() {
@@ -92,7 +95,10 @@ const abilities = (() => {
     },
     activate() {
       if(this.placer.active) return;
-      if(this.power_level <= 0) return;
+      if(this.power_level <= 0) {
+        this.out_of_battery_sound.play();
+        return;
+      }
       if(this.index === null) {
         if(this.placed_array.length === 0) return;
         this.index = 0;
@@ -129,6 +135,7 @@ const abilities = (() => {
       static idle_sprite;
       static lightning_sprite;
       static depowered_sprite;
+      static dash_sound;
 
       static dash_speed = 50;
       static total_dash_length = 0.2;
@@ -136,6 +143,7 @@ const abilities = (() => {
         this.idle_sprite = new material.Sprite(miscSpriteSheet, 0, 8, 8, 8);
         this.lightning_sprite = new material.Sprite(miscSpriteSheet, 0, 16, 32, 8);
         this.depowered_sprite = new material.Sprite(miscSpriteSheet, 8, 8, 8, 8);
+        this.dash_sound = loadSound('./assets/sounds/whoosh.mp3');
       }
       static try_to_place(click_grid_pos) {
         return new this(click_grid_pos.x, click_grid_pos.y);
@@ -155,7 +163,7 @@ const abilities = (() => {
       }
       activate() {
         if(!this.activate_box.is_overlapping_aabb(player.aabb)) return false;
-
+        abilities.Dash.dash_sound.play();
         console.log("player is dashing");
         this.done = false;
         player.dashActivate(abilities.Dash.deactivate(this), this);

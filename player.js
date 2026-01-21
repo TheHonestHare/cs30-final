@@ -46,6 +46,7 @@ class Player {
   }
 
   static SPRITES = [];
+  static death_sound;
   static preload() {
     Player.SPRITES.push(new material.Sprite(miscSpriteSheet, 0, 0, 8, 8));
     Player.SPRITES.push(new material.Sprite(miscSpriteSheet, 8, 0, 8, 8));
@@ -54,6 +55,8 @@ class Player {
     Player.SPRITES.push(new material.Sprite(miscSpriteSheet, 32, 0, 8, 8));
     Player.SPRITES.push(new material.Sprite(miscSpriteSheet, 40, 0, 8, 8));
     Player.SPRITES.push(new material.Sprite(miscSpriteSheet, 48, 0, 8, 8));
+
+    Player.death_sound = loadSound('assets/sounds/death.wav');
   }
 
   getSprite() {
@@ -338,6 +341,7 @@ class Player {
       this.aabb.origin = level.spawnPos.copy();
     }
     cam.calculateCameraStartPos(null, level.w, level.h);
+    Player.death_sound.play();
   }
   
   process_input() {
