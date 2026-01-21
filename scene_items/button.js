@@ -2,6 +2,7 @@ class Button {
   static off_sprites = [];
   static on_sprites = [];
   static press_sound;
+  static default_selected_channel = 0;
   static preload() {
     for(const coordx of [0, 8, 16, 24]) {
       Button.off_sprites.push(new material.Sprite(miscSpriteSheet, coordx, 48, 8, 8));
@@ -37,7 +38,7 @@ class Button {
     return new Button({
       x: x,
       y: y,
-      channel: 0,
+      channel: Button.default_selected_channel,
     });
   }
 
