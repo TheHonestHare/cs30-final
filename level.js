@@ -10,7 +10,7 @@ class Level {
 
     this.scene_items = [];
     scene_items.forEach((val) => {
-      this.scene_items.push(SceneItems.processEntry(val));
+      this.scene_items.push(SceneItems.processEntry(val));  
     });
     this.starting_power = starting_power;
     this.channels = channels;
@@ -46,9 +46,9 @@ class Level {
     this.img = img;
   }
   setBlock(x, y, val) {
-    if(!between(x, -1, level.w) || !between(y, -1, level.h)) return;
-    level.block_array[y * level.w + x] = true;
-    level.createLevelImage();
+    if(!between(x, -1, this.w) || !between(y, -1, this.h)) return;
+    this.block_array[y * this.w + x] = true;
+    this.createLevelImage();
   }
   // helper function
   getBlockProperties(x, y) {
@@ -64,6 +64,21 @@ class Level {
     }
   }
 
+  // returns new level object which should immediately be assigned to level
+  resize(neww, newh) {
+    const newBlockArray = (new Array(neww * newh)).fill(0);
+    for(let x = 0; x < Math.min(neww, this.w); x++) {
+      for(let y = 0; y < Math.min(newh, this.h); y++) {
+        newBlockArray[y * neww + x] = this.block_array[y * this.w + x];
+      }
+    }
+    this.block_array = newBlockArray;
+    this.w = neww;
+    this.h = newh;
+    this.createLevelImage();
+    cam.calculateCameraStartPos(cam.followMode)
+  }
+
   toJSON() {
     return {
       block_array: this.block_array,
@@ -73,6 +88,8 @@ class Level {
       spawnx: this.spawnPos.x,
       spawny: this.spawnPos.y,
       scene_items: this.scene_items,
+      starting_power: this.starting_power,
+      channels: this.channels,
     };
   }
 }
@@ -110,4 +127,5 @@ let levelList = [];
 function preloadLevelList() {
   levelList.push(loadJSON('./levels/level1.json'));
   levelList.push(loadJSON('./levels/level2.json'));
+  levelList.push(loadJSON('./levels/level3.json'));
 }
