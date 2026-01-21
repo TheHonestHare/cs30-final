@@ -97,4 +97,5 @@ let levelList = [];
 
 function preloadLevelList() {
   levelList.push(loadJSON('./levels/level1.json'));
+  levelList.push(loadJSON('./levels/level2.json'));
 }

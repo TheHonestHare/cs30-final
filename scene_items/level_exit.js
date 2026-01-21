@@ -1,7 +1,7 @@
 class LevelExitTrigger {
   static preload() {}
   constructor(data) {
-    this.aabb = new physics.AABB(createVector(data.x, data.y), createVector());
+    this.aabb = new physics.AABB(createVector(data.x, data.y), createVector(data.dimx, data.dimy));
     this.nextLevel = data.nextLevel;
   }
   tick() {

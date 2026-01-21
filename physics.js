@@ -279,7 +279,6 @@ const physics = (() => {
       };
       // thing took damage
       if(deathTime !== undefined && (res === undefined || deathTime < res.time)) {
-        console.log(res)
         if(onDamage()) return;
       }
       // didn't collide with any blocks
