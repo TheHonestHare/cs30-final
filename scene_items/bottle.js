@@ -4,6 +4,10 @@ class EnergyBottle {
   static twoBottlesSprite;
   static twoBottlesCollectedSprite;
 
+  static defaults = {
+    count: 1,
+  };
+
   static clink_1_sound;
   static clink_2_sound;
 
@@ -59,7 +63,7 @@ class EnergyBottle {
     return new EnergyBottle({
       x: x,
       y: y,
-      count: 1
+      count: EnergyBottle.defaults.count,
     });
   }
 }
