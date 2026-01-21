@@ -4,7 +4,7 @@ const SceneItems = {
     res.set("SignalTower", SignalTower);
     res.set("EnergyBottle", EnergyBottle);
     res.set("LevelExitTrigger", LevelExitTrigger);
-    res.set("SceneItems", Button);
+    res.set("Button", Button);
     res.set("Gate", Gate);
     return res;
   })(),
