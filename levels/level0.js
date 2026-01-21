@@ -34,6 +34,7 @@ const level0 = {
       y: 31,
       energy_level: 3
     }
-  ]
+  ],
+  channels: [false, false, false, false],
 
 };

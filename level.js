@@ -1,5 +1,5 @@
 class Level {
-  constructor(block_array, block_names, w, h, spawnx, spawny, scene_items) {
+  constructor(block_array, block_names, w, h, spawnx, spawny, scene_items, channels) {
     // deep copy array
     this.block_array = [...block_array];
     this.block_names = block_names;
@@ -12,10 +12,11 @@ class Level {
     scene_items.forEach((val) => {
       this.scene_items.push(SceneItems.processEntry(val));
     });
+    this.channels = channels;
     this.createLevelImage();
   }
   static fromObject(obj) {
-    return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items);
+    return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items, obj.channels);
   }
   draw() {
     image(this.img, 0, 0, this.w, this.h);
@@ -51,6 +52,15 @@ class Level {
   // helper function
   getBlockProperties(x, y) {
     return material.getBlockProperties(this.block_names[this.block_array[y * this.w + x]]);
+  }
+
+  reset() {
+    for(let i = 0; i < this.channels.length; i++) {
+      this.channels[i] = false;
+    }
+    for(const item of this.scene_items) {
+      item.reset();
+    }
   }
 
   toJSON() {

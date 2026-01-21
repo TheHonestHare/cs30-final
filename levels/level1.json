@@ -1337,5 +1337,6 @@
             "dimy": 1,
             "nextLevel": 2
         }
-    ]
+    ],
+    "channels": [false, false, false, false]
 }

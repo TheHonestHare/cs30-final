@@ -14,9 +14,7 @@ class SignalTower {
     if(abilities.placer.can_enter) {
       abilities.power_level = this.energy_level;
       abilities.index = null;
-      level.scene_items.forEach((obj) => {
-        obj.reset();
-      });
+      level.reset();
     }
   }
   draw() {
