@@ -35,6 +35,7 @@ const level0 = {
       energy_level: 3
     }
   ],
+  starting_power: 1,
   channels: [false, false, false, false],
 
 };

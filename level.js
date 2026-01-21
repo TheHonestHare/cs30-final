@@ -1,5 +1,5 @@
 class Level {
-  constructor(block_array, block_names, w, h, spawnx, spawny, scene_items, channels) {
+  constructor(block_array, block_names, w, h, spawnx, spawny, scene_items, starting_power, channels) {
     // deep copy array
     this.block_array = [...block_array];
     this.block_names = block_names;
@@ -12,11 +12,12 @@ class Level {
     scene_items.forEach((val) => {
       this.scene_items.push(SceneItems.processEntry(val));
     });
+    this.starting_power = starting_power;
     this.channels = channels;
     this.createLevelImage();
   }
   static fromObject(obj) {
-    return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items, obj.channels);
+    return new Level(obj.block_array, obj.block_names, obj.w, obj.h, obj.spawnx, obj.spawny, obj.scene_items, obj.starting_power, obj.channels);
   }
   draw() {
     image(this.img, 0, 0, this.w, this.h);
@@ -82,6 +83,7 @@ const level_manager = {
     player.aabb.origin.x = level.spawnPos.x;
     player.aabb.origin.y = level.spawnPos.y;
     abilities.placed_array = [];
+    abilities.power_level = level.starting_power;
     cam.calculateCameraStartPos();
 
     // tutorial

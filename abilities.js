@@ -1,6 +1,8 @@
 const abilities = (() => {
   return {
     out_of_battery_sound: undefined,
+    modem_dial_sound: undefined,
+    busy_signal_sound: undefined,
     list: undefined,
     placed_array: [],
     power_level: 0,
@@ -14,6 +16,7 @@ const abilities = (() => {
       ACTIVE: 3,
       ICON: 4,
     },
+    
     placer: {
       active: false,
       can_enter: true,
@@ -49,12 +52,14 @@ const abilities = (() => {
         abilities.placed_array.push(maybe_ability);
       },
       exit() {
+        abilities.busy_signal_sound.play();
         this.active = false;
         player.ignoreInput = false;
         cam.followMode = cam.modes.free;
         abilities.index = null;
       },
       enter() {
+        abilities.modem_dial_sound.play();
         this.active = true;
         player.ignoreInput = true;
         cam.followMode = cam.modes.fly;
@@ -71,6 +76,8 @@ const abilities = (() => {
       this.placer.selected_ability = this.Climb;
 
       this.out_of_battery_sound = loadSound('assets/sounds/out_of_battery.mp3');
+      this.modem_dial_sound = loadSound('assets/sounds/modem_dial.mp3');
+      this.busy_signal_sound = loadSound('assets/sounds/busy_signal.mp3');
     },
 
     draw() {

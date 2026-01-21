@@ -1318,12 +1318,6 @@
     "spawny": 19,
     "scene_items": [
         {
-            "type": "SignalTower",
-            "x": 2,
-            "y": 14,
-            "energy_level": 1
-        },
-        {
             "type": "EnergyBottle",
             "x": 43,
             "y": 17,
@@ -1338,5 +1332,6 @@
             "nextLevel": 2
         }
     ],
+    "starting_power": 1,
     "channels": [false, false, false, false]
 }

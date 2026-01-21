@@ -335,6 +335,9 @@ class Player {
 
   respawn() {
     this.vel = createVector(0, 0);
+    abilities.power_level = level.starting_power;
+    abilities.index = null;
+    level.reset();
     if(level.scene_items[0] instanceof SignalTower) {
       this.aabb.origin = level.scene_items[0].aabb.origin.copy();
     } else {
