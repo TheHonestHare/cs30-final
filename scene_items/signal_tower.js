@@ -1,6 +1,9 @@
 class SignalTower {
   static off_sprite;
   static on_sprite;
+  static defaults = {
+    energy_level: 3,
+  };
   static preload() {
     SignalTower.off_sprite = new material.Sprite(miscSpriteSheet, 56, 0, 8, 16);
     SignalTower.on_sprite = new material.Sprite(miscSpriteSheet, 56, 16, 8, 16);
@@ -29,7 +32,7 @@ class SignalTower {
     return new SignalTower({
       x: x,
       y: y-6,
-      energy_level: 3,
+      energy_level: SignalTower.defaults.energy_level,
     });
   }
 
