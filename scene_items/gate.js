@@ -1,6 +1,11 @@
 class Gate {
   static horizontal_sprite;
   static vertical_sprite;
+  static defaults = {
+    channel: 0,
+    horizontal: false,
+    inverted: false,
+  };
   static preload() {
     Gate.horizontal_sprite = new material.Sprite(miscSpriteSheet, 32, 48, 8, 8);
     Gate.vertical_sprite = new material.Sprite(miscSpriteSheet, 32, 56, 8, 8);
@@ -39,9 +44,9 @@ class Gate {
     return new Gate({
       x: x,
       y: y,
-      channel: 0,
-      horizontal: true,
-      inverted: false,
+      channel: Gate.defaults.channel,
+      horizontal: Gate.defaults.horizontal,
+      inverted: Gate.defaults.inverted,
     });
   }
 
