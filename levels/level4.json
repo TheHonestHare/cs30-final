@@ -1524,6 +1524,30 @@
             "x": 44,
             "y": 2,
             "count": 2
+        },
+        {
+            "type": "LevelExitTrigger",
+            "x": 47,
+            "y": 6,
+            "dimx": 1,
+            "dimy": 1,
+            "nextLevel": 5
+        },
+        {
+            "type": "LevelExitTrigger",
+            "x": 47,
+            "y": 7,
+            "dimx": 1,
+            "dimy": 1,
+            "nextLevel": 5
+        },
+        {
+            "type": "LevelExitTrigger",
+            "x": 47,
+            "y": 8,
+            "dimx": 1,
+            "dimy": 1,
+            "nextLevel": 5
         }
     ],
     "starting_power": 1,

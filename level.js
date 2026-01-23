@@ -94,7 +94,7 @@ class Level {
   }
 }
 const level_manager = {
-  "level": 0,
+  "level": 1,
   load() {
     level = this.getNthLevel(this.level);
     player.aabb.origin.x = level.spawnPos.x;
