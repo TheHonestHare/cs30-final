@@ -76,7 +76,7 @@ class Level {
     this.w = neww;
     this.h = newh;
     this.createLevelImage();
-    cam.calculateCameraStartPos(cam.followMode)
+    cam.calculateCameraStartPos(cam.followMode);
   }
 
   toJSON() {
@@ -104,7 +104,7 @@ const level_manager = {
     cam.calculateCameraStartPos();
 
     // tutorial
-    if(this.level === 1) {
+    if(this.level === 2) {
       abilities.placed_array.push(abilities.Dash.try_to_place(createVector(18, 15)));
       abilities.placed_array.push(abilities.Dash.try_to_place(createVector(24, 13)));
       abilities.placed_array.push(abilities.Dash.try_to_place(createVector(24, 6)));
@@ -128,4 +128,6 @@ function preloadLevelList() {
   levelList.push(loadJSON('./levels/level1.json'));
   levelList.push(loadJSON('./levels/level2.json'));
   levelList.push(loadJSON('./levels/level3.json'));
+  levelList.push(loadJSON('./levels/level4.json'));
+  levelList.push(loadJSON('./levels/level5.json'));
 }

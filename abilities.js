@@ -73,7 +73,7 @@ const abilities = (() => {
       this.list.forEach((obj) => {
         obj.preload();
       });
-      this.placer.selected_ability = this.Climb;
+      this.placer.selected_ability = this.Dash;
 
       this.out_of_battery_sound = loadSound('assets/sounds/out_of_battery.mp3');
       this.modem_dial_sound = loadSound('assets/sounds/modem_dial.mp3');
